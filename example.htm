@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>SinriScoreDrawer Example</title>
+	<script src="./SinriScoreDrawer.js"></script>
+	<script type="text/javascript">
+		function parse_and_draw_score_text(){
+			var canvas=SinriScoreDrawer.E('myCanvas');
+			var textarea=SinriScoreDrawer.E('ta');
+			var the_score_data=SinriScoreDrawer.parseScoreString(textarea.value);
+			SinriScoreDrawer.E('parsed_json').value=JSON.stringify(the_score_data,null,2);
+			SinriScoreDrawer.loadScoreData(canvas,the_score_data,{width:30,height:50});
+
+			// SinriScoreDrawer.loadScoreData(SinriScoreDrawer.E('myCanvas'),SinriScoreDrawer.parseScoreString(SinriScoreDrawer.E('ta').value),{width:30,height:60});
+		}
+	</script>
+	<style type="text/css">
+		div {
+			margin: 5px;
+		}
+		#ta {
+			width: 90%;
+			height: 100px;
+		}
+		#btn_p{
+			padding: 5px;
+			background: #039aff;
+			color: white;
+			border: none;
+		}
+		#parsed_json {
+			display: block;
+			float: left;
+			width: 25%;
+			height: 500px;
+			margin-right: 10px;
+		}
+		#myCanvas {
+			display: block;
+			float: left;
+			/*border:1px solid #000000;*/
+			border: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="header">
+		<a href="https://github.com/sinri/SinriScoreDrawer">SinriScoreDrawer</a> Example ↓ Write score below and click button to see result.
+		<button id="btn_p" onclick='parse_and_draw_score_text()'>Parse and Draw Score Text</button>
+	</div>
+	<div id="edit_pane">		
+		<textarea id="ta">~ 1=D 4/4　　　　　　选本129首　　　　　　父的启示
+3 3 4 5 | 5 4~ 3 2 | 1 1 2 3 | 3. 2_ 2- |
+> 阿爸父啊，我们现在 因主到你 面前来；
+3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2. 1_ 1- |
+> 你的儿女 到此聚集，愿得应许 的福气。
+2 2 3 1 | 2 (3_ 4_) 3 1 | 2 (3_ 4_) 3 2 | 1 2 5<- |
+> 祂的宝血 已洗 我们，我们 藉祂 来得恩，
+3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2. 1_ 1- ||
+> 你灵也已 指教我们，呼喊阿爸 近你身。
+</textarea>
+	</div>
+	<div id="display_pane">
+		<textarea id="parsed_json" readonly="readonly"></textarea>
+		<canvas id="myCanvas" width="600" height="600" style="">
+		</canvas>
+	</div>
+</body>
+</html>
