@@ -255,7 +255,6 @@ var SinriScoreDrawer={
 				SinriScoreDrawer.writeText(
 					canvas,
 					note_text,
-					//[cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
 					[cell_attr.ss+0*cell_attr.score_size.w*cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
 					{
 						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
@@ -278,33 +277,18 @@ var SinriScoreDrawer={
 			
 
 			// sharp ♯ and flat ♭
+			var sfn_char='';
 			if(score.sharp){
-				SinriScoreDrawer.writeText(
-					canvas,
-					'♯',
-					[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+t+cell_attr.k*0.25],
-					{
-						font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'center',
-						textBaseline:'middle'
-					}
-				);
-			}
-			else if(score.flat){
-				SinriScoreDrawer.writeText(
-					canvas,
-					'♭',
-					[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+t+cell_attr.k*0.25],
-					{
-						font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'center',
-						textBaseline:'middle'
-					}
-				);
+				sfn_char='♯';
+			}else if(score.flat){
+				sfn_char='♭';
 			}else if(score.natual){
+				sfn_char='♮';
+			}
+			if(sfn_char!==''){
 				SinriScoreDrawer.writeText(
 					canvas,
-					'♮',
+					sfn_char,
 					[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+t+cell_attr.k*0.25],
 					{
 						font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
