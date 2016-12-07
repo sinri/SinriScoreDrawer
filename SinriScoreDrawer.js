@@ -25,14 +25,10 @@ function SinriScoreDrawer(canvas_id){
 	}
 	// Canvas
 	this.setStrokeStyle=function(style){
-		if(style){
-			this.canvas.getContext("2d").strokeStyle = style;
-		}
+		this.canvas.getContext("2d").strokeStyle = style;
 	}
 	this.setFillStyle=function(style){
-		if(style){
-			this.canvas.getContext("2d").fillStyle = style;
-		}
+		this.canvas.getContext("2d").fillStyle = style;
 	}
 	this.drawLine=function(point_start,point_end){
 		var ctx = this.canvas.getContext("2d");
@@ -260,30 +256,15 @@ function SinriScoreDrawer(canvas_id){
 					note_text=mp[score.special_note];
 				}
 			}
-			if(score.title){
-				this.writeText(
-					note_text,
-					// [cell_attr.ss+0*cell_attr.score_size.w*cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					this.getPointOfCellCenter(cell_attr),
-					{
-						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'left',
-						textBaseline:'middle'
-					}
-				);
-			}else{
-				this.writeText(
-					note_text,
-					// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					this.getPointOfCellCenter(cell_attr),
-					{
-						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'center',
-						textBaseline:'middle'
-					}
-				);
-			}
-			
+			this.writeText(
+				note_text,
+				this.getPointOfCellCenter(cell_attr),
+				{
+					font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+					textAlign:(score.title?'left':'center'),
+					textBaseline:'middle'
+				}
+			);
 
 			// sharp ♯ and flat ♭
 			var sfn_char='';
