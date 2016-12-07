@@ -17,6 +17,12 @@ var SinriScoreDrawer={
 	P:function(x,y){
 		return {x:x,y:y};
 	},
+	INC:function(obj,delta){
+		if(!obj){
+			obj=0;
+		}
+		return obj+delta;
+	},
 	/////
 	setStrokeStyle:function(canvas,style){
 		if(style){
@@ -51,19 +57,19 @@ var SinriScoreDrawer={
 		ctx.closePath();//ctx.lineTo(sp[0],ep[1]);
 		ctx.stroke();
 	},
-	drawCircle:function(canvas,point_center,radius){
+	drawCircle:function(canvas,point_center,radius,method){
 		var ctx = canvas.getContext("2d");
 		ctx.beginPath();
 		ctx.arc(point_center[0],point_center[1],radius,0,2*Math.PI);
 		ctx.closePath();
+		if(method==='fill'){
+			ctx.fill();
+			return;
+		}
 		ctx.stroke();
 	},
 	drawDot:function(canvas,point_center,radius){
-		var ctx = canvas.getContext("2d");
-		ctx.beginPath();
-		ctx.arc(point_center[0],point_center[1],radius,0,2*Math.PI);
-		ctx.closePath();
-		ctx.fill();
+		SinriScoreDrawer.drawCircle(canvas,point_center,radius,'fill');
 	},
 	drawArcForKeep:function(canvas,point_start_x,point_end_x,point_y,omega,triplets){
 		var ctx = canvas.getContext("2d");
@@ -575,20 +581,22 @@ var SinriScoreDrawer={
 				}
 			}else if(c==='<'){
 				if(flag===3){
-					if(note.underpoints){
-						note.underpoints+=1;
-					}else{
-						note.underpoints=1;
-					}
+					// if(note.underpoints){
+					// 	note.underpoints+=1;
+					// }else{
+					// 	note.underpoints=1;
+					// }
+					note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
 					flag=3;
 				}
 			}else if(c==='>'){
 				if(flag===3){
-					if(note.upperpoints){
-						note.upperpoints+=1;
-					}else{
-						note.upperpoints=1;
-					}
+					// if(note.upperpoints){
+					// 	note.upperpoints+=1;
+					// }else{
+					// 	note.upperpoints=1;
+					// }
+					note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
 					flag=3;
 				}
 			}else if(c==='.'){
@@ -598,11 +606,12 @@ var SinriScoreDrawer={
 				}
 			}else if(c==='_'){
 				if(flag===3 || flag===5){
-					if(note.underlines){
-						note.underlines+=1;
-					}else{
-						note.underlines=1;
-					}
+					// if(note.underlines){
+					// 	note.underlines+=1;
+					// }else{
+					// 	note.underlines=1;
+					// }
+					note.underlines=SinriScoreDrawer.INC(note.underlines,1);
 					flag=5;//has underlines
 				}
 			}else if(c==='-'){
