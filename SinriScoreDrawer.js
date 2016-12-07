@@ -550,48 +550,33 @@ var SinriScoreDrawer={
 		}];
 	},
 	parseNoteStringForControlSign:function(note_text){
-		if(note_text==='||:'){
-			return [{special_note:'REPEAT_START_DOUBLE'}];
+		let mp={
+			'||:':'REPEAT_START_DOUBLE',
+			':||':'REPEAT_END_DOUBLE',
+			'|:':'REPEAT_START_SINGLE',
+			':|':'REPEAT_END_SINGLE',
+			'||':'FIN',
+			'|':'PHARSE_FIN'
 		}
-		if(note_text===':||'){
-			return [{special_note:'REPEAT_END_DOUBLE'}];
-		}
-		if(note_text==='|:'){
-			return [{special_note:'REPEAT_START_SINGLE'}];
-		}
-		if(note_text===':|'){
-			return [{special_note:'REPEAT_END_SINGLE'}];
-		}
-		if(note_text==='||'){
-			return [{special_note:'FIN'}];
-		}
-		if(note_text==='|'){
-			return [{special_note:'PHARSE_FIN'}];
+		if(mp[note_text]){
+			return [{special_note:mp[note_text]}];
 		}
 
 		return false;
 	},
 	parseNoteStringForNotation:function(c,flag,note){
-		if(c==='('){
-			if(flag===0){
-				note.keep_start=true;
-				flag=1;//has keep_start
-			}
-		}else if(c==='#'){
-			if(flag<=1){
-				note.sharp=true;
-				flag=2;//has sharp/flat
-			}
-		}else if(c==='b'){
-			if(flag<=1){
-				note.flat=true;
-				flag=2;//has sharp/flat
-			}
-		}else if(c==='n'){
-			if(flag<=1){
-				note.natual=true;
-				flag=2;//has sharp/flat
-			}
+		if(c==='(' && flag===0){
+			note.keep_start=true;
+			flag=1;//has keep_start
+		}else if(c==='#' && flag<=1){
+			note.sharp=true;
+			flag=2;//has sharp/flat
+		}else if(c==='b' && flag<=1){
+			note.flat=true;
+			flag=2;//has sharp/flat
+		}else if(c==='n' && flag<=1){
+			note.natual=true;
+			flag=2;//has sharp/flat
 		}else if(c>='0' && c<='9'){
 			if(flag<=2){
 				note.note=c;
@@ -607,39 +592,25 @@ var SinriScoreDrawer={
 			note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
 		}else if(c==='>' && flag===3){
 			note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
-		}else if(c==='.'){
-			if(flag===3){
-				note.dot=true;
-				flag=4;//has dot
-			}
-		}else if(c==='_'){
-			if(flag===3 || flag===5){
-				note.underlines=SinriScoreDrawer.INC(note.underlines,1);
-				flag=5;//has underlines
-			}
-		}else if(c==='-'){
-			if(flag===3 || flag===6){
-				note._has_long_line+=1;
-				flag=6;//has long line
-			}
-		}else if(c==='*'){
-			if(flag===3 || flag===7){
-				flag=7;
-			}
-		}else if(c==='\/'){
-			if(flag===3 || flag===8){
-				flag=8;
-			}
-		}else if(c===')'){
-			if(flag>3){
-				note.keep_end=true;
-				flag=9;
-			}
-		}else if(c==='~'){
-			if(flag===3){
-				note.fermata=true;
-				flag=3;
-			}
+		}else if(c==='.' && flag===3){
+			note.dot=true;
+			flag=4;//has dot
+		}else if(c==='_' && (flag===3 || flag===5)){
+			note.underlines=SinriScoreDrawer.INC(note.underlines,1);
+			flag=5;//has underlines
+		}else if(c==='-' && (flag===3 || flag===6)){
+			note._has_long_line+=1;
+			flag=6;//has long line
+		}else if(c==='*' && (flag===3 || flag===7)){
+			flag=7;
+		}else if(c==='\/' && (flag===3 || flag===8)){
+			flag=8;
+		}else if(c===')' && flag>3){
+			note.keep_end=true;
+			flag=9;
+		}else if(c==='~' && flag===3){
+			note.fermata=true;
+			flag=3;
 		}
 		return flag;
 	},

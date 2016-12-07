@@ -14,6 +14,20 @@
 
 			// SinriScoreDrawer.loadScoreData(SinriScoreDrawer.E('myCanvas'),SinriScoreDrawer.parseScoreString(SinriScoreDrawer.E('ta').value),{width:30,height:60});
 		}
+
+		var p=function(v){
+			this.value=v;
+			this.see_value=function(){
+				return this.value;
+			};
+			this.add_value_by_k=function(k){
+				this.value+=k;
+			};
+		}
+		var q=new p(2);
+		console.log(q.see_value());
+		q.add_value_by_k(1);
+		console.log(q.see_value());
 	</script>
 	<style type="text/css">
 		div {
