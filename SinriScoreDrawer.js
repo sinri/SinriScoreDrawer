@@ -201,9 +201,14 @@ var SinriScoreDrawer={
 		w+=2;
 		return {h:h,w:w};
 	},
+	getPointOfCellCenter:function(cell_attr){
+		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
+		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
+		return [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5];
+	},
 	printOneScoreCell:function(canvas,cell_attr,score,show_cell_border){
-		var t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
-		var tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
+		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
+		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
 		if(show_cell_border){
 			SinriScoreDrawer.setStrokeStyle(canvas,"lightblue");
 			SinriScoreDrawer.drawPolygon(canvas,[
@@ -226,7 +231,8 @@ var SinriScoreDrawer={
 		if(typeof score === 'string'){
 			SinriScoreDrawer.writeText(
 				canvas,score[0],
-				[cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
+				// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
+				SinriScoreDrawer.getPointOfCellCenter(cell_attr),
 				{
 					font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 					textAlign:'center',
@@ -240,29 +246,27 @@ var SinriScoreDrawer={
 				note_text=score.note[0];
 			}
 			if(score.special_note){
+				let mp={
+					'REPEAT_START_DOUBLE':"‖:",
+					'REPEAT_END_DOUBLE':":‖",
+					'REPEAT_START_SINGLE':"|:",
+					'REPEAT_END_SINGLE':":|",
+					'LONGER_LINE':"ー",
+					'FIN':"‖",
+					'PHARSE_FIN':"|"
+				}
 				if(score.special_note==='AS_IS' && score.note){
 					note_text=score.note;
-				}else if(score.special_note==='REPEAT_START_DOUBLE'){
-					note_text="‖:";
-				}else if(score.special_note==='REPEAT_END_DOUBLE'){
-					note_text=":‖";
-				}else if(score.special_note==='REPEAT_START_SINGLE'){
-					note_text="|:";
-				}else if(score.special_note==='REPEAT_END_SINGLE'){
-					note_text=":|";
-				}else if(score.special_note==='LONGER_LINE'){
-					note_text="ー";
-				}else if(score.special_note==='FIN'){
-					note_text="‖";
-				}else if(score.special_note==='PHARSE_FIN'){
-					note_text="|";
+				}else if(mp[score.special_note]){
+					note_text=mp[score.special_note];
 				}
 			}
 			if(score.title){
 				SinriScoreDrawer.writeText(
 					canvas,
 					note_text,
-					[cell_attr.ss+0*cell_attr.score_size.w*cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
+					// [cell_attr.ss+0*cell_attr.score_size.w*cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
+					SinriScoreDrawer.getPointOfCellCenter(cell_attr),
 					{
 						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 						textAlign:'left',
@@ -273,7 +277,8 @@ var SinriScoreDrawer={
 				SinriScoreDrawer.writeText(
 					canvas,
 					note_text,
-					[cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
+					// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
+					SinriScoreDrawer.getPointOfCellCenter(cell_attr),
 					{
 						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 						textAlign:'center',
@@ -648,19 +653,19 @@ var SinriScoreDrawer={
 		if(note_text==='||:'){
 			return [{special_note:'REPEAT_START_DOUBLE'}];
 		}
-		else if(note_text===':||'){
+		if(note_text===':||'){
 			return [{special_note:'REPEAT_END_DOUBLE'}];
 		}
-		else if(note_text==='|:'){
+		if(note_text==='|:'){
 			return [{special_note:'REPEAT_START_SINGLE'}];
 		}
-		else if(note_text===':|'){
+		if(note_text===':|'){
 			return [{special_note:'REPEAT_END_SINGLE'}];
 		}
-		else if(note_text==='||'){
+		if(note_text==='||'){
 			return [{special_note:'FIN'}];
 		}
-		else if(note_text==='|'){
+		if(note_text==='|'){
 			return [{special_note:'PHARSE_FIN'}];
 		}
 
