@@ -10,6 +10,7 @@
 * For debug, you can get the notes in the format of JSON Array with this
 	SinriScoreDrawer.parseScoreString(SCORE_TEXT);
 */
+//try to use new
 var SinriScoreDrawer={
 	E:function(id){
 		return document.getElementById(id);
