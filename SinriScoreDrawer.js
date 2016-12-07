@@ -356,6 +356,20 @@ var SinriScoreDrawer={
 				upper_y=upper_y-6;
 			}
 
+			if(score.effect_word){
+				SinriScoreDrawer.writeText(
+					canvas,
+					score.effect_word,
+					[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
+					{
+						font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
+						textAlign:'left',
+						textBaseline:'middle'
+					}
+				);
+				upper_y=upper_y-6;
+			}
+
 			//under part
 
 			var underline_y=cell_attr.cell_offset_y+t+cell_attr.k+3;
@@ -523,18 +537,26 @@ var SinriScoreDrawer={
 		 **35->5 
 		 * [\)]?
 		 */
-		var regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?$/;
+		var regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
 		if(!regex.test(note_text)){
 			return [{
 				special_note:'AS_IS',
 				note:note_text
 			}]
 		}
+
 		var note={};
 		var flag=0;//beginning
 		var has_long_line=0;
 		var times_divided=0;
 		var times_multiply=0;
+
+		var parts=note_text.split(':');
+		if(parts[1] && SinriScoreDrawer.NoteEffectWordDictory[parts[1]]){
+			note.effect_word=SinriScoreDrawer.NoteEffectWordDictory[parts[1]];
+		}
+		note_text=parts[0];
+
 		for(var i=0;i<note_text.length;i++){
 			var c=note_text[i];
 			if(c==='('){
@@ -660,5 +682,11 @@ var SinriScoreDrawer={
 		}
 
 		return notes;
-	}
+	},
+	NoteEffectWordDictory:{
+		"F":'f',
+		"FF":'ff',
+		"P":'p',
+		"PP":'pp'
+	},
 }
