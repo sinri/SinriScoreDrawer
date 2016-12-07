@@ -6,28 +6,12 @@
 	<script src="./SinriScoreDrawer.js"></script>
 	<script type="text/javascript">
 		function parse_and_draw_score_text(){
-			var canvas=SinriScoreDrawer.E('myCanvas');
-			var textarea=SinriScoreDrawer.E('ta');
-			var the_score_data=SinriScoreDrawer.parseScoreString(textarea.value);
-			SinriScoreDrawer.E('parsed_json').value=JSON.stringify(the_score_data,null,2);
-			SinriScoreDrawer.loadScoreData(canvas,the_score_data,{width:30,height:50});
-
-			// SinriScoreDrawer.loadScoreData(SinriScoreDrawer.E('myCanvas'),SinriScoreDrawer.parseScoreString(SinriScoreDrawer.E('ta').value),{width:30,height:60});
+			var SSD=new SinriScoreDrawer('myCanvas');
+			var textarea=SSD.E('ta');
+			var the_score_data=SSD.parseScoreString(textarea.value);
+			SSD.E('parsed_json').value=JSON.stringify(the_score_data,null,2);
+			SSD.loadScoreData(the_score_data,{width:30,height:50});
 		}
-
-		var p=function(v){
-			this.value=v;
-			this.see_value=function(){
-				return this.value;
-			};
-			this.add_value_by_k=function(k){
-				this.value+=k;
-			};
-		}
-		var q=new p(2);
-		console.log(q.see_value());
-		q.add_value_by_k(1);
-		console.log(q.see_value());
 	</script>
 	<style type="text/css">
 		div {

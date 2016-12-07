@@ -2,52 +2,51 @@
 * SinriScoreDrawer
 * -----------------------
 * Load from score text to display numbered musical notation on a canvas element.
-	SinriScoreDrawer.loadScoreData(
-		SinriScoreDrawer.E(CANVAS_ID),
-		SinriScoreDrawer.parseScoreString(SCORE_TEXT),
-		{width:30,height:60}
-	);
+	var SSD=new SinriScoreDrawer('myCanvas');
+	var textarea=SSD.E('ta');
+	var the_score_data=SSD.parseScoreString(textarea.value);
+	SSD.loadScoreData(the_score_data,{width:30,height:50});
 * For debug, you can get the notes in the format of JSON Array with this
-	SinriScoreDrawer.parseScoreString(SCORE_TEXT);
+	var the_score_data=SSD.parseScoreString(textarea.value);
 */
-//try to use new
-var SinriScoreDrawer={
-	E:function(id){
+function SinriScoreDrawer(canvas_id){
+	// Helper
+	this.E=function(id){
 		return document.getElementById(id);
-	},
-	P:function(x,y){
+	}
+	this.P=function(x,y){
 		return {x:x,y:y};
-	},
-	INC:function(obj,delta){
+	}
+	this.INC=function(obj,delta){
 		if(!obj){
 			obj=0;
 		}
 		return obj+delta;
-	},
-	/////
-	setStrokeStyle:function(canvas,style){
+	}
+	// Canvas
+	this.setStrokeStyle=function(style){
 		if(style){
-			canvas.getContext("2d").strokeStyle = style;
+			this.canvas.getContext("2d").strokeStyle = style;
 		}
-	},
-	setFillStyle:function(canvas,style){
+	}
+	this.setFillStyle=function(style){
 		if(style){
-			canvas.getContext("2d").fillStyle = style;
+			this.canvas.getContext("2d").fillStyle = style;
 		}
-	},
-	drawLine:function(canvas,point_start,point_end){
-		var ctx = canvas.getContext("2d");
+	}
+	this.drawLine=function(point_start,point_end){
+		var ctx = this.canvas.getContext("2d");
 		ctx.beginPath();
 		ctx.moveTo(point_start[0],point_start[1]);
 		ctx.lineTo(point_end[0],point_end[1]);
 		ctx.closePath();
 		ctx.stroke();
-	},
-	drawPolygon:function(canvas,points){
+	}
+	this.drawPolygon=function(points){
 		if(!points||points.length<=2){
 			return false;
 		}
-		var ctx = canvas.getContext("2d");
+		var ctx = this.canvas.getContext("2d");
 		ctx.beginPath();
 		var sp=points[0];
 		ctx.moveTo(sp[0],sp[1]);
@@ -57,9 +56,9 @@ var SinriScoreDrawer={
 		}
 		ctx.closePath();//ctx.lineTo(sp[0],ep[1]);
 		ctx.stroke();
-	},
-	drawCircle:function(canvas,point_center,radius,method){
-		var ctx = canvas.getContext("2d");
+	}
+	this.drawCircle=function(point_center,radius,method){
+		var ctx = this.canvas.getContext("2d");
 		ctx.beginPath();
 		ctx.arc(point_center[0],point_center[1],radius,0,2*Math.PI);
 		ctx.closePath();
@@ -68,12 +67,12 @@ var SinriScoreDrawer={
 			return;
 		}
 		ctx.stroke();
-	},
-	drawDot:function(canvas,point_center,radius){
-		SinriScoreDrawer.drawCircle(canvas,point_center,radius,'fill');
-	},
-	drawArcForKeep:function(canvas,point_start_x,point_end_x,point_y,omega,triplets){
-		var ctx = canvas.getContext("2d");
+	}
+	this.drawDot=function(point_center,radius){
+		this.drawCircle(point_center,radius,'fill');
+	}
+	this.drawArcForKeep=function(point_start_x,point_end_x,point_y,omega,triplets){
+		var ctx = this.canvas.getContext("2d");
 		var point_start=[point_start_x,point_y];
 		var point_end=[point_end_x,point_y];
 		var delta_y=0;
@@ -103,15 +102,15 @@ var SinriScoreDrawer={
 		}
 
 		if(triplets){
-			SinriScoreDrawer.writeText(canvas,'3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
+			this.writeText('3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
 				font:''+omega*1.5+'px monospace',
 				// textAlign:'center',
 				textBaseline:'middle'
 			});
 		}
-	},
-	writeText:function(canvas,text,point_base,requirements){
-		var ctx = canvas.getContext("2d");
+	}
+	this.writeText=function(text,point_base,requirements){
+		var ctx = this.canvas.getContext("2d");
 		ctx.font = "30px Arial";
 		if(requirements){
 			if(requirements.font)ctx.font=requirements.font;
@@ -124,13 +123,13 @@ var SinriScoreDrawer={
 			ctx.fillText(text,point_base[0],point_base[1]);
 		}
 		
-	},
-	/////
+	}
+	// 按照编译完的对象制图
 	/**
 	 * @param score_data as array
 	 */
-	loadScoreData:function(canvas,score_data,cell_size,no_auto_canvas_size){
-		var score_size=SinriScoreDrawer.getScoreSize(score_data);
+	this.loadScoreData=function(score_data,cell_size,no_auto_canvas_size){
+		var score_size=this.getScoreSize(score_data);
 
 		var s=40,ss=40,k=24,kk=24;
 
@@ -142,13 +141,13 @@ var SinriScoreDrawer={
 
 			//modify canvas
 			if(!no_auto_canvas_size){
-				canvas.height=score_size.h*s;
-				canvas.width=score_size.w*ss;
+				this.canvas.height=score_size.h*s;
+				this.canvas.width=score_size.w*ss;
 			}
 
 		}else{
-			var s_from_h=parseInt(Math.floor(1.0*canvas.height/score_size.h),10);
-			var s_from_w=parseInt(Math.floor(1.0*canvas.width/score_size.w),10);
+			var s_from_h=parseInt(Math.floor(1.0*this.canvas.height/score_size.h),10);
+			var s_from_w=parseInt(Math.floor(1.0*this.canvas.width/score_size.w),10);
 			s=Math.min(s_from_w,s_from_h);
 			k=parseInt(Math.floor(s*0.6),10);
 			ss=s;
@@ -156,16 +155,16 @@ var SinriScoreDrawer={
 		}
 
 		var entire_offset={
-			x:parseInt(Math.floor((1.0*canvas.width-ss*(score_size.w))/2),10),
+			x:parseInt(Math.floor((1.0*this.canvas.width-ss*(score_size.w))/2),10),
 			y:0
 		};
 
 		for(let y=0;y<score_size.h-2;y++){
 			var score_line=score_data[y];
-			SinriScoreDrawer.keep_sign_set=[];
+			this.keep_sign_set=[];
 			for(var x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
-					SinriScoreDrawer.printOneScoreCell(canvas,{
+					this.printOneScoreCell({
 						s:s,//cell's total height
 						k:k,//char area height
 						ss:ss,//cell's total width
@@ -176,11 +175,10 @@ var SinriScoreDrawer={
 					},score_line[x]);
 				}
 			}
-			for(let keep_index=0;keep_index<SinriScoreDrawer.keep_sign_set.length;keep_index++){
-				var keep_info=SinriScoreDrawer.keep_sign_set[keep_index];
+			for(let keep_index=0;keep_index<this.keep_sign_set.length;keep_index++){
+				var keep_info=this.keep_sign_set[keep_index];
 				if(keep_info && keep_info.start && keep_info.end){
-					SinriScoreDrawer.drawArcForKeep(
-						canvas,
+					this.drawArcForKeep(
 						keep_info.start.x,
 						keep_info.end.x,
 						Math.max(keep_info.start.y,keep_info.end.y),
@@ -190,8 +188,8 @@ var SinriScoreDrawer={
 				}
 			}
 		}
-	},
-	getScoreSize:function(score_data){
+	}
+	this.getScoreSize=function(score_data){
 		var h=score_data.length+2;
 		var w=0;
 		for(let i=0;i<score_data.length;i++){
@@ -201,39 +199,39 @@ var SinriScoreDrawer={
 		}
 		w+=2;
 		return {h:h,w:w};
-	},
-	getPointOfCellCenter:function(cell_attr){
+	}
+	this.getPointOfCellCenter=function(cell_attr){
 		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
 		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
 		return [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5];
-	},
-	printOneScoreCell:function(canvas,cell_attr,score,show_cell_border){
+	}
+	this.printOneScoreCell=function(cell_attr,score,show_cell_border){
 		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
 		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
 		if(show_cell_border){
-			SinriScoreDrawer.setStrokeStyle(canvas,"lightblue");
-			SinriScoreDrawer.drawPolygon(canvas,[
+			this.setStrokeStyle("lightblue");
+			this.drawPolygon([
 				[cell_attr.cell_offset_x,cell_attr.cell_offset_y],
 				[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y],
 				[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y+cell_attr.s],
 				[cell_attr.cell_offset_x,cell_attr.cell_offset_y+cell_attr.s]
 			]);
-			SinriScoreDrawer.setStrokeStyle(canvas,"lightgray");
-			SinriScoreDrawer.drawPolygon(canvas,[
+			this.setStrokeStyle("lightgray");
+			this.drawPolygon([
 				[cell_attr.cell_offset_x+tt,cell_attr.cell_offset_y+t],
 				[cell_attr.cell_offset_x+tt+cell_attr.kk,cell_attr.cell_offset_y+t],
 				[cell_attr.cell_offset_x+tt+cell_attr.kk,cell_attr.cell_offset_y+t+cell_attr.k],
 				[cell_attr.cell_offset_x+tt,cell_attr.cell_offset_y+t+cell_attr.k]
 			]);
 		}	
-		SinriScoreDrawer.setStrokeStyle(canvas,"black");
-		SinriScoreDrawer.setFillStyle(canvas,"black");
+		this.setStrokeStyle("black");
+		this.setFillStyle("black");
 
 		if(typeof score === 'string'){
-			SinriScoreDrawer.writeText(
-				canvas,score[0],
+			this.writeText(
+				score[0],
 				// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-				SinriScoreDrawer.getPointOfCellCenter(cell_attr),
+				this.getPointOfCellCenter(cell_attr),
 				{
 					font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 					textAlign:'center',
@@ -263,11 +261,10 @@ var SinriScoreDrawer={
 				}
 			}
 			if(score.title){
-				SinriScoreDrawer.writeText(
-					canvas,
+				this.writeText(
 					note_text,
 					// [cell_attr.ss+0*cell_attr.score_size.w*cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					SinriScoreDrawer.getPointOfCellCenter(cell_attr),
+					this.getPointOfCellCenter(cell_attr),
 					{
 						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 						textAlign:'left',
@@ -275,11 +272,10 @@ var SinriScoreDrawer={
 					}
 				);
 			}else{
-				SinriScoreDrawer.writeText(
-					canvas,
+				this.writeText(
 					note_text,
 					// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					SinriScoreDrawer.getPointOfCellCenter(cell_attr),
+					this.getPointOfCellCenter(cell_attr),
 					{
 						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 						textAlign:'center',
@@ -299,8 +295,7 @@ var SinriScoreDrawer={
 				sfn_char='♮';
 			}
 			if(sfn_char!==''){
-				SinriScoreDrawer.writeText(
-					canvas,
+				this.writeText(
 					sfn_char,
 					[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+t+cell_attr.k*0.25],
 					{
@@ -312,8 +307,7 @@ var SinriScoreDrawer={
 			}
 
 			if(score.dot){
-				SinriScoreDrawer.drawDot(
-					canvas,
+				this.drawDot(
 					[cell_attr.cell_offset_x+cell_attr.ss*0.8,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
 					2
 				);
@@ -328,8 +322,7 @@ var SinriScoreDrawer={
 			if(upperpoints && upperpoints>0){
 				upper_y=upper_y-1;
 				for(let i=0;i<upperpoints;i++){
-					SinriScoreDrawer.drawDot(
-						canvas,
+					this.drawDot(
 						[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
 						2
 					);
@@ -338,15 +331,13 @@ var SinriScoreDrawer={
 			}
 
 			if(score.fermata){// /.\
-				SinriScoreDrawer.drawArcForKeep(
-					canvas,
+				this.drawArcForKeep(
 					cell_attr.cell_offset_x+cell_attr.ss*0.1,
 					cell_attr.cell_offset_x+cell_attr.ss*0.9,
 					upper_y-3,
 					cell_attr.ss*0.9*0.2
 				);
-				SinriScoreDrawer.drawDot(
-					canvas,
+				this.drawDot(
 					[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
 					2
 				);
@@ -354,8 +345,7 @@ var SinriScoreDrawer={
 			}
 
 			if(score.effect_word){
-				SinriScoreDrawer.writeText(
-					canvas,
+				this.writeText(
 					score.effect_word,
 					[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
 					{
@@ -378,8 +368,7 @@ var SinriScoreDrawer={
 			}
 			if(underlines && underlines>0){
 				for(let i=0;i<underlines;i++){
-					SinriScoreDrawer.drawLine(
-						canvas,
+					this.drawLine(
 						[cell_attr.cell_offset_x,underline_y],
 						[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
 					);
@@ -391,8 +380,7 @@ var SinriScoreDrawer={
 			if(underpoints && underpoints>0){
 				underline_y=underline_y+1;
 				for(let i=0;i<underpoints;i++){
-					SinriScoreDrawer.drawDot(
-						canvas,
+					this.drawDot(
 						[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
 						2
 					);
@@ -406,28 +394,27 @@ var SinriScoreDrawer={
 				triplets=score.triplets;
 			}
 			if(score.keep_start && score.keep_end){
-				SinriScoreDrawer.drawArcForKeep(
-					canvas,
+				this.drawArcForKeep(
 					cell_attr.cell_offset_x+cell_attr.ss*0.1,
 					cell_attr.cell_offset_x+cell_attr.ss*0.9,
 					upper_y,
 					cell_attr.ss*0.9*0.2
 				);
 			}else{
-				if((SinriScoreDrawer.keep_sign_set.length-1)>=0 && !SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end){
+				if((this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end){
 					let s_or_e='';
 					if(score.keep_start){
 						s_or_e='start';
 					}else if(score.keep_end){
 						s_or_e='end';
 					}
-					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)][s_or_e]={
+					this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
 						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 						y:upper_y,
 						triplets:triplets
 					};
 				}else if(score.keep_start){
-					SinriScoreDrawer.keep_sign_set.push({
+					this.keep_sign_set.push({
 						start:{
 							x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 							y:upper_y,
@@ -437,7 +424,7 @@ var SinriScoreDrawer={
 				}
 			}
 		}
-	},
+	}
 	//////
 	/**
 	 * RULE SET
@@ -458,7 +445,7 @@ var SinriScoreDrawer={
 	 * 12. For fin, use \|\|
 	 * 13. Sharp and flat
 	 */
-	parseScoreString:function(score_text){
+	this.parseScoreString=function(score_text){
 		let score_data=[];
 		let lines=score_text.split(/[\r\n]+/);
 		for(let line_index=0;line_index<lines.length;line_index++){
@@ -475,28 +462,28 @@ var SinriScoreDrawer={
 				notes=lines[line_index].slice(2).split('');
 				// alert(notes);
 			}
-			let line_data=SinriScoreDrawer.parseScoreLineString(notes,type);
+			let line_data=this.parseScoreLineString(notes,type);
 			score_data.push(line_data);
 		}
 		return score_data;
-	},
-	parseScoreLineString:function(notes,type){
+	}
+	this.parseScoreLineString=function(notes,type){
 		let line_data=[];
 		for(let note_index=0;note_index<notes.length;note_index++){
-			let note_results=SinriScoreDrawer.parseNoteString(notes[note_index],type);
+			let note_results=this.parseNoteString(notes[note_index],type);
 			console.log("PARSE",notes[note_index],JSON.stringify(note_results));
 			for(let i=0;i<note_results.length;i++){
 				line_data.push(note_results[i]);
 			}
 		}
 		return line_data;
-	},
-	parseNoteString:function(note_text,type){
+	}
+	this.parseNoteString=function(note_text,type){
 		if(type){
-			return SinriScoreDrawer.parseNoteStringWithType(note_text,type);
+			return this.parseNoteStringWithType(note_text,type);
 		}
 
-		let control_sign_note=SinriScoreDrawer.parseNoteStringForControlSign(note_text);
+		let control_sign_note=this.parseNoteStringForControlSign(note_text);
 		if(control_sign_note){
 			return control_sign_note;
 		}
@@ -518,19 +505,19 @@ var SinriScoreDrawer={
 		let flag=0;//beginning
 
 		let parts=note_text.split(':');
-		if(parts[1] && SinriScoreDrawer.NoteEffectWordDictory[parts[1]]){
-			note.effect_word=SinriScoreDrawer.NoteEffectWordDictory[parts[1]];
+		if(parts[1] && this.NoteEffectWordDictory[parts[1]]){
+			note.effect_word=this.NoteEffectWordDictory[parts[1]];
 		}
 		note_text=parts[0];
 
 		for(let i=0;i<note_text.length;i++){
 			let c=note_text[i];
-			flag=SinriScoreDrawer.parseNoteStringForNotation(c,flag,note);
+			flag=this.parseNoteStringForNotation(c,flag,note);
 		}
 
-		return SinriScoreDrawer.parseNoteStringForNotationAddition(note);
-	},
-	parseNoteStringWithType:function(note_text,type){
+		return this.parseNoteStringForNotationAddition(note);
+	}
+	this.parseNoteStringWithType=function(note_text,type){
 		if(type==='TITLE'){
 			return [{
 				special_note:'AS_IS',
@@ -549,8 +536,8 @@ var SinriScoreDrawer={
 			special_note:'AS_IS',
 			note:note_text
 		}];
-	},
-	parseNoteStringForControlSign:function(note_text){
+	}
+	this.parseNoteStringForControlSign=function(note_text){
 		let mp={
 			'||:':'REPEAT_START_DOUBLE',
 			':||':'REPEAT_END_DOUBLE',
@@ -564,8 +551,8 @@ var SinriScoreDrawer={
 		}
 
 		return false;
-	},
-	parseNoteStringForNotation:function(c,flag,note){
+	}
+	this.parseNoteStringForNotation=function(c,flag,note){
 		if(c==='(' && flag===0){
 			note.keep_start=true;
 			flag=1;//has keep_start
@@ -590,14 +577,14 @@ var SinriScoreDrawer={
 				flag=8;//\
 			}
 		}else if(c==='<' && flag===3){
-			note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
+			note.underpoints=this.INC(note.underpoints,1);
 		}else if(c==='>' && flag===3){
-			note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
+			note.upperpoints=this.INC(note.upperpoints,1);
 		}else if(c==='.' && flag===3){
 			note.dot=true;
 			flag=4;//has dot
 		}else if(c==='_' && (flag===3 || flag===5)){
-			note.underlines=SinriScoreDrawer.INC(note.underlines,1);
+			note.underlines=this.INC(note.underlines,1);
 			flag=5;//has underlines
 		}else if(c==='-' && (flag===3 || flag===6)){
 			note._has_long_line+=1;
@@ -614,8 +601,8 @@ var SinriScoreDrawer={
 			flag=3;
 		}
 		return flag;
-	},
-	parseNoteStringForNotationAddition:function(note){
+	}
+	this.parseNoteStringForNotationAddition=function(note){
 		if(note._times_multiply>0){
 			note._has_long_line=note._times_multiply-1;
 		}
@@ -632,19 +619,28 @@ var SinriScoreDrawer={
 			}
 		}
 
+		let has_long_line=note._has_long_line;
+		delete note._has_long_line;
+		delete note._times_divided;
+		delete note._times_multiply;
+
 		let notes=[note];
-		for(let j=0;j<note._has_long_line;j++){
+		for(let j=0;j<has_long_line;j++){
 			notes.push({
 				special_note:'LONGER_LINE'
 			});
 		}
 
 		return notes;
-	},
-	NoteEffectWordDictory:{
+	}
+	this.NoteEffectWordDictory={
 		"F":'f',
 		"FF":'ff',
 		"P":'p',
 		"PP":'pp'
 	}
+
+
+	// initialize
+	this.canvas=this.E(canvas_id);
 }
