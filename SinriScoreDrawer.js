@@ -121,7 +121,7 @@ var SinriScoreDrawer={
 	/**
 	 * @param score_data as array
 	 */
-	loadScoreData:function(canvas,score_data,cell_size){
+	loadScoreData:function(canvas,score_data,cell_size,no_auto_canvas_size){
 		var score_size=SinriScoreDrawer.getScoreSize(score_data);
 
 		var s=40,ss=40,k=24,kk=24;
@@ -133,7 +133,7 @@ var SinriScoreDrawer={
 			kk=parseInt(Math.floor(ss*0.6),10);
 
 			//modify canvas
-			if(true){
+			if(!no_auto_canvas_size){
 				canvas.height=score_size.h*s;
 				canvas.width=score_size.w*ss;
 			}
@@ -194,10 +194,10 @@ var SinriScoreDrawer={
 		w+=2;
 		return {h:h,w:w};
 	},
-	printOneScoreCell:function(canvas,cell_attr,score){
+	printOneScoreCell:function(canvas,cell_attr,score,show_cell_border){
 		var t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
 		var tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
-		if(!true){
+		if(show_cell_border){
 			SinriScoreDrawer.setStrokeStyle(canvas,"lightblue");
 			SinriScoreDrawer.drawPolygon(canvas,[
 				[cell_attr.cell_offset_x,cell_attr.cell_offset_y],
@@ -401,9 +401,8 @@ var SinriScoreDrawer={
 				if(score.triplets){
 					triplets=score.triplets;
 				}
-				var last_index=SinriScoreDrawer.keep_sign_set.length-1;
-				if(last_index>=0 && !SinriScoreDrawer.keep_sign_set[last_index].end){
-					SinriScoreDrawer.keep_sign_set[last_index].start={
+				if((SinriScoreDrawer.keep_sign_set.length-1)>=0 && !SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end){
+					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].start={
 						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 						y:upper_y,
 						triplets:triplets
@@ -418,9 +417,8 @@ var SinriScoreDrawer={
 					});
 				}
 			}else if(score.keep_end){
-				var last_index=SinriScoreDrawer.keep_sign_set.length-1;
-				if(last_index>=0 && !SinriScoreDrawer.keep_sign_set[last_index].end){
-					SinriScoreDrawer.keep_sign_set[last_index].end={
+				if((SinriScoreDrawer.keep_sign_set.length-1)>=0 && !SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end){
+					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end={
 						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 						y:upper_y
 					};
@@ -574,7 +572,7 @@ var SinriScoreDrawer={
 					times_divided=times_divided*10+1*c;
 					flag=8;//\
 				}
-			}else if(c=='<'){
+			}else if(c==='<'){
 				if(flag===3){
 					if(note.underpoints){
 						note.underpoints+=1;
@@ -583,7 +581,7 @@ var SinriScoreDrawer={
 					}
 					flag=3;
 				}
-			}else if(c=='>'){
+			}else if(c==='>'){
 				if(flag===3){
 					if(note.upperpoints){
 						note.upperpoints+=1;
@@ -658,7 +656,7 @@ var SinriScoreDrawer={
 		}
 
 		var notes=[note];
-		for(var i=0;i<has_long_line;i++){
+		for(var j=0;j<has_long_line;j++){
 			notes.push({
 				special_note:'LONGER_LINE',
 				dot:fin_long_line_has_dot
@@ -672,5 +670,5 @@ var SinriScoreDrawer={
 		"FF":'ff',
 		"P":'p',
 		"PP":'pp'
-	},
+	}
 }
