@@ -395,6 +395,10 @@ var SinriScoreDrawer={
 			}
 
 			//keep
+			var triplets=false;
+			if(score.triplets){
+				triplets=score.triplets;
+			}
 			if(score.keep_start && score.keep_end){
 				SinriScoreDrawer.drawArcForKeep(
 					canvas,
@@ -403,18 +407,20 @@ var SinriScoreDrawer={
 					upper_y,
 					cell_attr.ss*0.9*0.2
 				);
-			}else if(score.keep_start){
-				var triplets=false;
-				if(score.triplets){
-					triplets=score.triplets;
-				}
+			}else{
 				if((SinriScoreDrawer.keep_sign_set.length-1)>=0 && !SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end){
-					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].start={
+					let s_or_e='';
+					if(score.keep_start){
+						s_or_e='start';
+					}else if(score.keep_end){
+						s_or_e='end';
+					}
+					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)][s_or_e]={
 						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 						y:upper_y,
 						triplets:triplets
 					};
-				}else{
+				}else if(score.keep_start){
 					SinriScoreDrawer.keep_sign_set.push({
 						start:{
 							x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
@@ -422,13 +428,6 @@ var SinriScoreDrawer={
 							triplets:triplets
 						}
 					});
-				}
-			}else if(score.keep_end){
-				if((SinriScoreDrawer.keep_sign_set.length-1)>=0 && !SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end){
-					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end={
-						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
-						y:upper_y
-					};
 				}
 			}
 		}
@@ -579,26 +578,10 @@ var SinriScoreDrawer={
 					times_divided=times_divided*10+1*c;
 					flag=8;//\
 				}
-			}else if(c==='<'){
-				if(flag===3){
-					// if(note.underpoints){
-					// 	note.underpoints+=1;
-					// }else{
-					// 	note.underpoints=1;
-					// }
-					note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
-					flag=3;
-				}
-			}else if(c==='>'){
-				if(flag===3){
-					// if(note.upperpoints){
-					// 	note.upperpoints+=1;
-					// }else{
-					// 	note.upperpoints=1;
-					// }
-					note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
-					flag=3;
-				}
+			}else if(c==='<' && flag===3){
+				note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
+			}else if(c==='>' && flag===3){
+				note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
 			}else if(c==='.'){
 				if(flag===3){
 					note.dot=true;
@@ -606,11 +589,6 @@ var SinriScoreDrawer={
 				}
 			}else if(c==='_'){
 				if(flag===3 || flag===5){
-					// if(note.underlines){
-					// 	note.underlines+=1;
-					// }else{
-					// 	note.underlines=1;
-					// }
 					note.underlines=SinriScoreDrawer.INC(note.underlines,1);
 					flag=5;//has underlines
 				}
