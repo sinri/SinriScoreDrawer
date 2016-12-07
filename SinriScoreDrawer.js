@@ -509,11 +509,12 @@ var SinriScoreDrawer={
 			}]
 		}
 
-		let note={};
+		let note={
+			_has_long_line:0,
+			_times_divided:0,
+			_times_multiply:0
+		};
 		let flag=0;//beginning
-		let has_long_line=0;
-		let times_divided=0;
-		let times_multiply=0;
 
 		let parts=note_text.split(':');
 		if(parts[1] && SinriScoreDrawer.NoteEffectWordDictory[parts[1]]){
@@ -523,111 +524,10 @@ var SinriScoreDrawer={
 
 		for(let i=0;i<note_text.length;i++){
 			let c=note_text[i];
-			if(c==='('){
-				if(flag===0){
-					note.keep_start=true;
-					flag=1;//has keep_start
-				}
-			}else if(c==='#'){
-				if(flag<=1){
-					note.sharp=true;
-					flag=2;//has sharp/flat
-				}
-			}else if(c==='b'){
-				if(flag<=1){
-					note.flat=true;
-					flag=2;//has sharp/flat
-				}
-			}else if(c==='n'){
-				if(flag<=1){
-					note.natual=true;
-					flag=2;//has sharp/flat
-				}
-			}else if(c>='0' && c<='9'){
-				if(flag<=2){
-					note.note=c;
-					flag=3;//has note
-				}else if(flag===7){
-					times_multiply=times_multiply*10+1*c;
-					flag=7;//*
-				}else if(flag===8){
-					times_divided=times_divided*10+1*c;
-					flag=8;//\
-				}
-			}else if(c==='<' && flag===3){
-				note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
-			}else if(c==='>' && flag===3){
-				note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
-			}else if(c==='.'){
-				if(flag===3){
-					note.dot=true;
-					flag=4;//has dot
-				}
-			}else if(c==='_'){
-				if(flag===3 || flag===5){
-					note.underlines=SinriScoreDrawer.INC(note.underlines,1);
-					flag=5;//has underlines
-				}
-			}else if(c==='-'){
-				if(flag===3 || flag===6){
-					has_long_line+=1;
-					flag=6;//has long line
-				}
-			}else if(c==='*'){
-				if(flag===3 || flag===7){
-					flag=7;
-				}
-			}else if(c==='\/'){
-				if(flag===3 || flag===8){
-					flag=8;
-				}
-			}else if(c===')'){
-				if(flag>3){
-					note.keep_end=true;
-					flag=9;
-				}
-			}else if(c==='~'){
-				if(flag===3){
-					note.fermata=true;
-					flag=3;
-				}
-			}
+			flag=SinriScoreDrawer.parseNoteStringForNotation(c,flag,note);
 		}
 
-		let fin_long_line_has_dot=false;
-		if(times_multiply>0){
-			note.times_multiply=times_multiply;
-			if(times_multiply%2===0){
-				has_long_line=times_multiply/2;
-			}
-			else{
-				has_long_line=Math.floor(times_multiply/2);
-				fin_long_line_has_dot=true;
-			}
-		}
-		if(times_divided>0){
-			note.times_divided=times_divided;
-			if(times_divided===3){
-				note.triplets=true;
-			}
-			else if(times_divided%2===0){
-				note.underlines=times_divided/2;
-			}
-			else{
-				note.underlines=Math.floor(times_divided/2);
-				note.dot=true;
-			}
-		}
-
-		let notes=[note];
-		for(let j=0;j<has_long_line;j++){
-			notes.push({
-				special_note:'LONGER_LINE',
-				dot:fin_long_line_has_dot
-			});
-		}
-
-		return notes;
+		return SinriScoreDrawer.parseNoteStringForNotationAddition(note);
 	},
 	parseNoteStringWithType:function(note_text,type){
 		if(type==='TITLE'){
@@ -670,6 +570,104 @@ var SinriScoreDrawer={
 		}
 
 		return false;
+	},
+	parseNoteStringForNotation:function(c,flag,note){
+		if(c==='('){
+			if(flag===0){
+				note.keep_start=true;
+				flag=1;//has keep_start
+			}
+		}else if(c==='#'){
+			if(flag<=1){
+				note.sharp=true;
+				flag=2;//has sharp/flat
+			}
+		}else if(c==='b'){
+			if(flag<=1){
+				note.flat=true;
+				flag=2;//has sharp/flat
+			}
+		}else if(c==='n'){
+			if(flag<=1){
+				note.natual=true;
+				flag=2;//has sharp/flat
+			}
+		}else if(c>='0' && c<='9'){
+			if(flag<=2){
+				note.note=c;
+				flag=3;//has note
+			}else if(flag===7){
+				note._times_multiply=note._times_multiply*10+1*c;
+				flag=7;//*
+			}else if(flag===8){
+				note._times_divided=note._times_divided*10+1*c;
+				flag=8;//\
+			}
+		}else if(c==='<' && flag===3){
+			note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
+		}else if(c==='>' && flag===3){
+			note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
+		}else if(c==='.'){
+			if(flag===3){
+				note.dot=true;
+				flag=4;//has dot
+			}
+		}else if(c==='_'){
+			if(flag===3 || flag===5){
+				note.underlines=SinriScoreDrawer.INC(note.underlines,1);
+				flag=5;//has underlines
+			}
+		}else if(c==='-'){
+			if(flag===3 || flag===6){
+				note._has_long_line+=1;
+				flag=6;//has long line
+			}
+		}else if(c==='*'){
+			if(flag===3 || flag===7){
+				flag=7;
+			}
+		}else if(c==='\/'){
+			if(flag===3 || flag===8){
+				flag=8;
+			}
+		}else if(c===')'){
+			if(flag>3){
+				note.keep_end=true;
+				flag=9;
+			}
+		}else if(c==='~'){
+			if(flag===3){
+				note.fermata=true;
+				flag=3;
+			}
+		}
+		return flag;
+	},
+	parseNoteStringForNotationAddition:function(note){
+		if(note._times_multiply>0){
+			note._has_long_line=note._times_multiply-1;
+		}
+		if(note._times_divided>0){
+			if(note._times_divided===3){
+				note.triplets=true;
+			}
+			else if(note._times_divided%2===0){
+				note.underlines=note._times_divided/2;
+			}
+			else{
+				note.underlines=Math.floor(note._times_divided/2);
+				note.dot=true;
+			}
+		}
+
+		let notes=[note];
+		for(let j=0;j<note._has_long_line;j++){
+			notes.push({
+				special_note:'LONGER_LINE'
+			});
+		}
+
+		return notes;
 	},
 	NoteEffectWordDictory:{
 		"F":'f',
