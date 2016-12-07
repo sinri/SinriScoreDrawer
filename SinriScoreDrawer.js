@@ -453,79 +453,50 @@ var SinriScoreDrawer={
 	 * 13. Sharp and flat
 	 */
 	parseScoreString:function(score_text){
-		var score_data=[];
-		var lines=score_text.split(/[\r\n]+/);
+		let score_data=[];
+		let lines=score_text.split(/[\r\n]+/);
 		for(let line_index=0;line_index<lines.length;line_index++){
-			var notes=lines[line_index].trim().split(/[ ]+/);
-			var line_data=[];
-			var type=null;
-			var first_note_char=notes[0];
+			let notes=lines[line_index].trim().split(/[ ]+/);
+			
+			let type=null;
+			let first_note_char=notes[0];
 			if(first_note_char==='~'){
 				type='TITLE';
-				var title=(notes.shift() ? notes.join(' ') : lines[line_index]);
+				let title=(notes.shift() ? notes.join(' ') : lines[line_index]);
 				notes=[title];
 			}else if(first_note_char==='>'){
 				type='LYRIC';
 				notes=lines[line_index].slice(2).split('');
 				// alert(notes);
 			}
-			for(let note_index=0;note_index<notes.length;note_index++){
-				var note_results=SinriScoreDrawer.parseNoteString(notes[note_index],type);
-				console.log("PARSE",notes[note_index],JSON.stringify(note_results));
-				for(let i=0;i<note_results.length;i++){
-					line_data.push(note_results[i]);
-				}
-			}
+			let line_data=SinriScoreDrawer.parseScoreLineString(notes,type);
 			score_data.push(line_data);
 		}
 		return score_data;
 	},
+	parseScoreLineString:function(notes,type){
+		let line_data=[];
+		for(let note_index=0;note_index<notes.length;note_index++){
+			let note_results=SinriScoreDrawer.parseNoteString(notes[note_index],type);
+			console.log("PARSE",notes[note_index],JSON.stringify(note_results));
+			for(let i=0;i<note_results.length;i++){
+				line_data.push(note_results[i]);
+			}
+		}
+		return line_data;
+	},
 	parseNoteString:function(note_text,type){
-		if(type==='TITLE'){
-			return [{
-				special_note:'AS_IS',
-				note:note_text,
-				title:true
-			}]
+		if(type){
+			return SinriScoreDrawer.parseNoteStringWithType(note_text,type);
 		}
-		else if(type==='LYRIC'){
-			return [{
-				special_note:'AS_IS',
-				note:note_text
-			}]
-		}
-		
-		if(note_text==='||:'){
-			return [{special_note:'REPEAT_START_DOUBLE'}];
-		}
-		else if(note_text===':||'){
-			return [{special_note:'REPEAT_END_DOUBLE'}];
-		}
-		else if(note_text==='|:'){
-			return [{special_note:'REPEAT_START_SINGLE'}];
-		}
-		else if(note_text===':|'){
-			return [{special_note:'REPEAT_END_SINGLE'}];
-		}
-		else if(note_text==='||'){
-			return [{special_note:'FIN'}];
-		}
-		else if(note_text==='|'){
-			return [{special_note:'PHARSE_FIN'}];
+
+		let control_sign_note=SinriScoreDrawer.parseNoteStringForControlSign(note_text);
+		if(control_sign_note){
+			return control_sign_note;
 		}
 
 		//ELSE
-		/*
-		 *0->1 [\(]?
-		 *01->2 [#b]?
-		 *012... ([0]|[1-7](\<*|\>*))
-		 **3->4
-		 *3... (\.|_+|\-+|\*[1-9][0-9]*|\/[1-9][0-9]*)?
-		 **3->4 \.
-		 **35->5 
-		 * [\)]?
-		 */
-		var regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
+		let regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
 		if(!regex.test(note_text)){
 			return [{
 				special_note:'AS_IS',
@@ -533,20 +504,20 @@ var SinriScoreDrawer={
 			}]
 		}
 
-		var note={};
-		var flag=0;//beginning
-		var has_long_line=0;
-		var times_divided=0;
-		var times_multiply=0;
+		let note={};
+		let flag=0;//beginning
+		let has_long_line=0;
+		let times_divided=0;
+		let times_multiply=0;
 
-		var parts=note_text.split(':');
+		let parts=note_text.split(':');
 		if(parts[1] && SinriScoreDrawer.NoteEffectWordDictory[parts[1]]){
 			note.effect_word=SinriScoreDrawer.NoteEffectWordDictory[parts[1]];
 		}
 		note_text=parts[0];
 
 		for(let i=0;i<note_text.length;i++){
-			var c=note_text[i];
+			let c=note_text[i];
 			if(c==='('){
 				if(flag===0){
 					note.keep_start=true;
@@ -618,7 +589,7 @@ var SinriScoreDrawer={
 			}
 		}
 
-		var fin_long_line_has_dot=false;
+		let fin_long_line_has_dot=false;
 		if(times_multiply>0){
 			note.times_multiply=times_multiply;
 			if(times_multiply%2===0){
@@ -643,7 +614,7 @@ var SinriScoreDrawer={
 			}
 		}
 
-		var notes=[note];
+		let notes=[note];
 		for(let j=0;j<has_long_line;j++){
 			notes.push({
 				special_note:'LONGER_LINE',
@@ -652,6 +623,48 @@ var SinriScoreDrawer={
 		}
 
 		return notes;
+	},
+	parseNoteStringWithType:function(note_text,type){
+		if(type==='TITLE'){
+			return [{
+				special_note:'AS_IS',
+				note:note_text,
+				title:true
+			}];
+		}
+		else if(type==='LYRIC'){
+			return [{
+				special_note:'AS_IS',
+				note:note_text
+			}];
+		}
+		// IF NOT DETERMINED
+		return [{
+			special_note:'AS_IS',
+			note:note_text
+		}];
+	},
+	parseNoteStringForControlSign:function(note_text){
+		if(note_text==='||:'){
+			return [{special_note:'REPEAT_START_DOUBLE'}];
+		}
+		else if(note_text===':||'){
+			return [{special_note:'REPEAT_END_DOUBLE'}];
+		}
+		else if(note_text==='|:'){
+			return [{special_note:'REPEAT_START_SINGLE'}];
+		}
+		else if(note_text===':|'){
+			return [{special_note:'REPEAT_END_SINGLE'}];
+		}
+		else if(note_text==='||'){
+			return [{special_note:'FIN'}];
+		}
+		else if(note_text==='|'){
+			return [{special_note:'PHARSE_FIN'}];
+		}
+
+		return false;
 	},
 	NoteEffectWordDictory:{
 		"F":'f',
