@@ -66,19 +66,33 @@ var SinriScoreDrawer={
 		ctx.fill();
 	},
 	drawArcForKeep:function(canvas,point_start_x,point_end_x,point_y,omega,triplets){
-		var k=point_end_x-point_start_x;
-		var r=(4*omega*omega+k*k)/(8*omega);
-		var delta_y=r-omega;
-
+		var ctx = canvas.getContext("2d");
 		var point_start=[point_start_x,point_y];
 		var point_end=[point_end_x,point_y];
-		var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
 
-		var ctx = canvas.getContext("2d");
+		var keep_method='bezierCurve';
+		
+		if(keep_method==='arc'){// use arcTo
+			var k=point_end_x-point_start_x;
+			var r=(4*omega*omega+k*k)/(8*omega);
+			var delta_y=r-omega;
+			var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
 
-		ctx.moveTo(point_start[0], point_start[1]);
-		ctx.arcTo(point_top[0],point_top[1],point_end[0],point_end[1],r);
-		ctx.stroke();
+			ctx.moveTo(point_start[0], point_start[1]);
+			ctx.arcTo(point_top[0],point_top[1],point_end[0],point_end[1],r);
+			ctx.stroke();
+		}
+		else if(keep_method==='bezierCurve'){// use bezierCurveTo
+			var delta_x=(point_end_x-point_start_x)/4.0;
+			var delta_y=omega*0.8;
+			ctx.moveTo(point_start[0], point_start[1]);
+			ctx.bezierCurveTo(
+				point_start_x+delta_x, point_y-delta_y, 
+				point_end_x-delta_x, point_y-delta_y, 
+				point_end_x, point_y
+			);
+			ctx.stroke();
+		}
 
 		if(triplets){
 			SinriScoreDrawer.writeText(canvas,'3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
@@ -331,7 +345,7 @@ var SinriScoreDrawer={
 					canvas,
 					cell_attr.cell_offset_x+cell_attr.ss*0.1,
 					cell_attr.cell_offset_x+cell_attr.ss*0.9,
-					upper_y,
+					upper_y-3,
 					cell_attr.ss*0.9*0.2
 				);
 				SinriScoreDrawer.drawDot(
