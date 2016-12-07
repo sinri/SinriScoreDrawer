@@ -160,6 +160,8 @@ function SinriScoreDrawer(canvas_id){
 			this.keep_sign_set=[];
 			for(var x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
+					let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
+					let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
 					this.printOneScoreCell({
 						s:s,//cell's total height
 						k:k,//char area height
@@ -167,7 +169,9 @@ function SinriScoreDrawer(canvas_id){
 						kk:kk,//char area width
 						cell_offset_x:(entire_offset.x+ss*x+ss),
 						cell_offset_y:(s*y+s),
-						score_size:score_size
+						score_size:score_size,
+						t:t,
+						tt:tt
 					},score_line[x]);
 				}
 			}
@@ -197,212 +201,236 @@ function SinriScoreDrawer(canvas_id){
 		return {h:h,w:w};
 	}
 	this.getPointOfCellCenter=function(cell_attr){
-		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
-		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
-		return [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5];
+		return [
+			cell_attr.cell_offset_x+cell_attr.ss/2,
+			cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
+		];
+	}
+	this.debugDrawCellBorder=function(cell_attr){
+		this.setStrokeStyle("lightblue");
+		this.drawPolygon([
+			[cell_attr.cell_offset_x,cell_attr.cell_offset_y],
+			[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y],
+			[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y+cell_attr.s],
+			[cell_attr.cell_offset_x,cell_attr.cell_offset_y+cell_attr.s]
+		]);
+		this.setStrokeStyle("lightgray");
+		this.drawPolygon([
+			[cell_attr.cell_offset_x+cell_attr.tt,cell_attr.cell_offset_y+cell_attr.t],
+			[cell_attr.cell_offset_x+cell_attr.tt+cell_attr.kk,cell_attr.cell_offset_y+cell_attr.t],
+			[cell_attr.cell_offset_x+cell_attr.tt+cell_attr.kk,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k],
+			[cell_attr.cell_offset_x+cell_attr.tt,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k]
+		]);
 	}
 	this.printOneScoreCell=function(cell_attr,score,show_cell_border){
-		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
-		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
 		if(show_cell_border){
-			this.setStrokeStyle("lightblue");
-			this.drawPolygon([
-				[cell_attr.cell_offset_x,cell_attr.cell_offset_y],
-				[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y],
-				[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y+cell_attr.s],
-				[cell_attr.cell_offset_x,cell_attr.cell_offset_y+cell_attr.s]
-			]);
-			this.setStrokeStyle("lightgray");
-			this.drawPolygon([
-				[cell_attr.cell_offset_x+tt,cell_attr.cell_offset_y+t],
-				[cell_attr.cell_offset_x+tt+cell_attr.kk,cell_attr.cell_offset_y+t],
-				[cell_attr.cell_offset_x+tt+cell_attr.kk,cell_attr.cell_offset_y+t+cell_attr.k],
-				[cell_attr.cell_offset_x+tt,cell_attr.cell_offset_y+t+cell_attr.k]
-			]);
+			this.debugDrawCellBorder(cell_attr);
 		}	
 		this.setStrokeStyle("black");
 		this.setFillStyle("black");
 
 		if(typeof score === 'string'){
+			this.printOneScoreCellWithPureString(cell_attr,score[0]);
+		}else{
+			this.printOneScoreCellWithObject(cell_attr,score);
+		}
+	}
+	this.printOneScoreCellWithPureString=function(cell_attr,score){
+		this.writeText(
+			score,
+			this.getPointOfCellCenter(cell_attr),
+			{
+				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+				textAlign:'center',
+				textBaseline:'middle'
+			}
+		);
+	}
+	this.printOneScoreCellWithObject=function(cell_attr,score){
+		//note
+		this.printOneScoreCellWithObjectForText(cell_attr,score);
+
+		// SFND
+		this.printOneScoreCellWithObjectForSFN(cell_attr,score);
+
+		//upper part
+		let upper_y=this.printOneScoreCellWithObjectForUpper(cell_attr,score);
+
+		//under part
+		let underline_y=this.printOneScoreCellWithObjectForUnder(cell_attr,score);
+
+		//keep
+		this.printOneScoreCellWithObjectForKeep(cell_attr,score,upper_y);
+	}
+	this.printOneScoreCellWithObjectForText=function(cell_attr,score){
+		let note_text='';
+		if(score.note){
+			note_text=score.note[0];
+		}
+		if(score.special_note){
+			let mp={
+				'REPEAT_START_DOUBLE':"‖:",
+				'REPEAT_END_DOUBLE':":‖",
+				'REPEAT_START_SINGLE':"|:",
+				'REPEAT_END_SINGLE':":|",
+				'LONGER_LINE':"ー",
+				'FIN':"‖",
+				'PHARSE_FIN':"|"
+			}
+			if(score.special_note==='AS_IS' && score.note){
+				note_text=score.note;
+			}else if(mp[score.special_note]){
+				note_text=mp[score.special_note];
+			}
+		}
+		this.writeText(
+			note_text,
+			this.getPointOfCellCenter(cell_attr),
+			{
+				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+				textAlign:(score.title?'left':'center'),
+				textBaseline:'middle'
+			}
+		);
+	}
+	this.printOneScoreCellWithObjectForSFN=function(cell_attr,score){
+		let sfn_char='';
+		if(score.sharp){
+			sfn_char='♯';
+		}else if(score.flat){
+			sfn_char='♭';
+		}else if(score.natual){
+			sfn_char='♮';
+		}
+		if(sfn_char!==''){
 			this.writeText(
-				score[0],
-				// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-				this.getPointOfCellCenter(cell_attr),
+				sfn_char,
+				[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.25],
 				{
-					font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+					font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 					textAlign:'center',
 					textBaseline:'middle'
 				}
 			);
-		}else{
-			//note
-			var note_text='';
-			if(score.note){
-				note_text=score.note[0];
-			}
-			if(score.special_note){
-				let mp={
-					'REPEAT_START_DOUBLE':"‖:",
-					'REPEAT_END_DOUBLE':":‖",
-					'REPEAT_START_SINGLE':"|:",
-					'REPEAT_END_SINGLE':":|",
-					'LONGER_LINE':"ー",
-					'FIN':"‖",
-					'PHARSE_FIN':"|"
-				}
-				if(score.special_note==='AS_IS' && score.note){
-					note_text=score.note;
-				}else if(mp[score.special_note]){
-					note_text=mp[score.special_note];
-				}
-			}
-			this.writeText(
-				note_text,
-				this.getPointOfCellCenter(cell_attr),
-				{
-					font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-					textAlign:(score.title?'left':'center'),
-					textBaseline:'middle'
-				}
+		}
+
+		if(score.dot){
+			this.drawDot(
+				[cell_attr.cell_offset_x+cell_attr.ss*0.8,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5],
+				2
 			);
+		}
+	}
+	this.printOneScoreCellWithObjectForUpper=function(cell_attr,score){
+		let upper_y=cell_attr.cell_offset_y+cell_attr.t;
 
-			// sharp ♯ and flat ♭
-			var sfn_char='';
-			if(score.sharp){
-				sfn_char='♯';
-			}else if(score.flat){
-				sfn_char='♭';
-			}else if(score.natual){
-				sfn_char='♮';
-			}
-			if(sfn_char!==''){
-				this.writeText(
-					sfn_char,
-					[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+t+cell_attr.k*0.25],
-					{
-						font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'center',
-						textBaseline:'middle'
-					}
-				);
-			}
-
-			if(score.dot){
-				this.drawDot(
-					[cell_attr.cell_offset_x+cell_attr.ss*0.8,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					2
-				);
-			}
-
-			//upper part
-
-			var upper_y=cell_attr.cell_offset_y+t;
-
-			//upper points
-			var upperpoints=score.upperpoints;
-			if(upperpoints && upperpoints>0){
-				upper_y=upper_y-1;
-				for(let i=0;i<upperpoints;i++){
-					this.drawDot(
-						[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
-						2
-					);
-					upper_y=upper_y-6;
-				}
-			}
-
-			if(score.fermata){// /.\
-				this.drawArcForKeep(
-					cell_attr.cell_offset_x+cell_attr.ss*0.1,
-					cell_attr.cell_offset_x+cell_attr.ss*0.9,
-					upper_y-3,
-					cell_attr.ss*0.9*0.2
-				);
+		//upper points
+		let upperpoints=score.upperpoints;
+		if(upperpoints && upperpoints>0){
+			upper_y=upper_y-1;
+			for(let i=0;i<upperpoints;i++){
 				this.drawDot(
 					[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
 					2
 				);
 				upper_y=upper_y-6;
 			}
+		}
 
-			if(score.effect_word){
-				this.writeText(
-					score.effect_word,
-					[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
-					{
-						font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
-						textAlign:'left',
-						textBaseline:'middle'
-					}
-				);
-				upper_y=upper_y-6;
-			}
+		if(score.fermata){// /.\
+			this.drawArcForKeep(
+				cell_attr.cell_offset_x+cell_attr.ss*0.1,
+				cell_attr.cell_offset_x+cell_attr.ss*0.9,
+				upper_y-3,
+				cell_attr.ss*0.9*0.2
+			);
+			this.drawDot(
+				[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
+				2
+			);
+			upper_y=upper_y-6;
+		}
 
-			//under part
-
-			var underline_y=cell_attr.cell_offset_y+t+cell_attr.k+3;
-
-			//under lines
-			var underlines=score.underlines;
-			if(score.triplets){
-				underlines=1;
-			}
-			if(underlines && underlines>0){
-				for(let i=0;i<underlines;i++){
-					this.drawLine(
-						[cell_attr.cell_offset_x,underline_y],
-						[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
-					);
-					underline_y=underline_y+3;
+		if(score.effect_word){
+			this.writeText(
+				score.effect_word,
+				[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
+				{
+					font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
+					textAlign:'left',
+					textBaseline:'middle'
 				}
-			}
-			//under points
-			var underpoints=score.underpoints;
-			if(underpoints && underpoints>0){
-				underline_y=underline_y+1;
-				for(let i=0;i<underpoints;i++){
-					this.drawDot(
-						[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
-						2
-					);
-					underline_y=underline_y+6;
-				}
-			}
+			);
+			upper_y=upper_y-6;
+		}
 
-			//keep
-			var triplets=false;
-			if(score.triplets){
-				triplets=score.triplets;
-			}
-			if(score.keep_start && score.keep_end){
-				this.drawArcForKeep(
-					cell_attr.cell_offset_x+cell_attr.ss*0.1,
-					cell_attr.cell_offset_x+cell_attr.ss*0.9,
-					upper_y,
-					cell_attr.ss*0.9*0.2
+		return upper_y;
+	}
+	this.printOneScoreCellWithObjectForUnder=function(cell_attr,score){
+		let underline_y=cell_attr.cell_offset_y+cell_attr.t+cell_attr.k+3;
+
+		//under lines
+		let underlines=score.underlines;
+		if(score.triplets){
+			underlines=1;
+		}
+		if(underlines && underlines>0){
+			for(let i=0;i<underlines;i++){
+				this.drawLine(
+					[cell_attr.cell_offset_x,underline_y],
+					[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
 				);
-			}else{
-				if((this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end){
-					let s_or_e='';
-					if(score.keep_start){
-						s_or_e='start';
-					}else if(score.keep_end){
-						s_or_e='end';
-					}
-					this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
+				underline_y=underline_y+3;
+			}
+		}
+		//under points
+		let underpoints=score.underpoints;
+		if(underpoints && underpoints>0){
+			underline_y=underline_y+1;
+			for(let i=0;i<underpoints;i++){
+				this.drawDot(
+					[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
+					2
+				);
+				underline_y=underline_y+6;
+			}
+		}
+
+		return underline_y;
+	}
+	this.printOneScoreCellWithObjectForKeep=function(cell_attr,score,upper_y){
+		let triplets=false;
+		if(score.triplets){
+			triplets=score.triplets;
+		}
+		if(score.keep_start && score.keep_end){
+			this.drawArcForKeep(
+				cell_attr.cell_offset_x+cell_attr.ss*0.1,
+				cell_attr.cell_offset_x+cell_attr.ss*0.9,
+				upper_y,
+				cell_attr.ss*0.9*0.2
+			);
+		}else{
+			if((this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end){
+				let s_or_e='';
+				if(score.keep_start){
+					s_or_e='start';
+				}else if(score.keep_end){
+					s_or_e='end';
+				}
+				this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
+					x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
+					y:upper_y,
+					triplets:triplets
+				};
+			}else if(score.keep_start){
+				this.keep_sign_set.push({
+					start:{
 						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 						y:upper_y,
 						triplets:triplets
-					};
-				}else if(score.keep_start){
-					this.keep_sign_set.push({
-						start:{
-							x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
-							y:upper_y,
-							triplets:triplets
-						}
-					});
-				}
+					}
+				});
 			}
 		}
 	}
