@@ -44,7 +44,7 @@ var SinriScoreDrawer={
 		ctx.beginPath();
 		var sp=points[0];
 		ctx.moveTo(sp[0],sp[1]);
-		for(var i=1;i<points.length;i++){
+		for(let i=1;i<points.length;i++){
 			var ep=points[i];
 			ctx.lineTo(ep[0],ep[1]);
 		}
@@ -69,13 +69,14 @@ var SinriScoreDrawer={
 		var ctx = canvas.getContext("2d");
 		var point_start=[point_start_x,point_y];
 		var point_end=[point_end_x,point_y];
+		var delta_y=0;
 
 		var keep_method='bezierCurve';
 		
 		if(keep_method==='arc'){// use arcTo
 			var k=point_end_x-point_start_x;
 			var r=(4*omega*omega+k*k)/(8*omega);
-			var delta_y=r-omega;
+			delta_y=r-omega;
 			var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
 
 			ctx.moveTo(point_start[0], point_start[1]);
@@ -84,7 +85,7 @@ var SinriScoreDrawer={
 		}
 		else if(keep_method==='bezierCurve'){// use bezierCurveTo
 			var delta_x=(point_end_x-point_start_x)/4.0;
-			var delta_y=omega*0.8;
+			delta_y=omega*0.8;
 			ctx.moveTo(point_start[0], point_start[1]);
 			ctx.bezierCurveTo(
 				point_start_x+delta_x, point_y-delta_y, 
@@ -152,7 +153,7 @@ var SinriScoreDrawer={
 			y:0
 		};
 
-		for(var y=0;y<score_size.h-2;y++){
+		for(let y=0;y<score_size.h-2;y++){
 			var score_line=score_data[y];
 			SinriScoreDrawer.keep_sign_set=[];
 			for(var x=0;x<score_size.w-2;x++){
@@ -168,7 +169,7 @@ var SinriScoreDrawer={
 					},score_line[x]);
 				}
 			}
-			for(var keep_index=0;keep_index<SinriScoreDrawer.keep_sign_set.length;keep_index++){
+			for(let keep_index=0;keep_index<SinriScoreDrawer.keep_sign_set.length;keep_index++){
 				var keep_info=SinriScoreDrawer.keep_sign_set[keep_index];
 				if(keep_info && keep_info.start && keep_info.end){
 					SinriScoreDrawer.drawArcForKeep(
@@ -186,7 +187,7 @@ var SinriScoreDrawer={
 	getScoreSize:function(score_data){
 		var h=score_data.length+2;
 		var w=0;
-		for(var i=0;i<score_data.length;i++){
+		for(let i=0;i<score_data.length;i++){
 			if(score_data[i].length>w){
 				w=score_data[i].length;
 			}
@@ -314,7 +315,7 @@ var SinriScoreDrawer={
 			var upperpoints=score.upperpoints;
 			if(upperpoints && upperpoints>0){
 				upper_y=upper_y-1;
-				for(var i=0;i<upperpoints;i++){
+				for(let i=0;i<upperpoints;i++){
 					SinriScoreDrawer.drawDot(
 						canvas,
 						[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
@@ -364,7 +365,7 @@ var SinriScoreDrawer={
 				underlines=1;
 			}
 			if(underlines && underlines>0){
-				for(var i=0;i<underlines;i++){
+				for(let i=0;i<underlines;i++){
 					SinriScoreDrawer.drawLine(
 						canvas,
 						[cell_attr.cell_offset_x,underline_y],
@@ -377,7 +378,7 @@ var SinriScoreDrawer={
 			var underpoints=score.underpoints;
 			if(underpoints && underpoints>0){
 				underline_y=underline_y+1;
-				for(var i=0;i<underpoints;i++){
+				for(let i=0;i<underpoints;i++){
 					SinriScoreDrawer.drawDot(
 						canvas,
 						[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
@@ -449,7 +450,7 @@ var SinriScoreDrawer={
 	parseScoreString:function(score_text){
 		var score_data=[];
 		var lines=score_text.split(/[\r\n]+/);
-		for(var line_index=0;line_index<lines.length;line_index++){
+		for(let line_index=0;line_index<lines.length;line_index++){
 			var notes=lines[line_index].trim().split(/[ ]+/);
 			var line_data=[];
 			var type=null;
@@ -463,10 +464,10 @@ var SinriScoreDrawer={
 				notes=lines[line_index].slice(2).split('');
 				// alert(notes);
 			}
-			for(var note_index=0;note_index<notes.length;note_index++){
+			for(let note_index=0;note_index<notes.length;note_index++){
 				var note_results=SinriScoreDrawer.parseNoteString(notes[note_index],type);
 				console.log("PARSE",notes[note_index],JSON.stringify(note_results));
-				for(var i=0;i<note_results.length;i++){
+				for(let i=0;i<note_results.length;i++){
 					line_data.push(note_results[i]);
 				}
 			}
@@ -539,7 +540,7 @@ var SinriScoreDrawer={
 		}
 		note_text=parts[0];
 
-		for(var i=0;i<note_text.length;i++){
+		for(let i=0;i<note_text.length;i++){
 			var c=note_text[i];
 			if(c==='('){
 				if(flag===0){
@@ -656,7 +657,7 @@ var SinriScoreDrawer={
 		}
 
 		var notes=[note];
-		for(var j=0;j<has_long_line;j++){
+		for(let j=0;j<has_long_line;j++){
 			notes.push({
 				special_note:'LONGER_LINE',
 				dot:fin_long_line_has_dot
