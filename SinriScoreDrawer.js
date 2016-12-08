@@ -229,7 +229,7 @@ function SinriScoreDrawer(canvas_id){
 		}
 		return [
 			cell_attr.cell_offset_x+cell_attr.ss*p_x,
-			cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*p_y;
+			cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*p_y
 		];
 	}
 	this.debugDrawCellBorder=function(cell_attr){
