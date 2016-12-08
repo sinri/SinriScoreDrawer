@@ -163,8 +163,8 @@ function SinriScoreDrawer(canvas_id){
 			this.keep_sign_set=[];
 			for(let x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
-					let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
-					let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
+					// let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
+					// let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
 					this.printOneScoreCell({
 						s:s,//cell's total height
 						k:k,//char area height
@@ -173,8 +173,8 @@ function SinriScoreDrawer(canvas_id){
 						cell_offset_x:(entire_offset.x+ss*x+ss),
 						cell_offset_y:(s*y+s),
 						score_size:score_size,
-						t:t,
-						tt:tt
+						t:parseInt(Math.floor((s-k)/2.0),10),
+						tt:parseInt(Math.floor((ss-kk)/2.0),10)
 					},score_line[x]);
 				}
 			}
