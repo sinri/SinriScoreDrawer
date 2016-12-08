@@ -201,11 +201,25 @@ function SinriScoreDrawer(canvas_id){
 		w+=2;
 		return {h:h,w:w};
 	}
-	this.getPointOfCellCenter=function(cell_attr){
-		return [
-			cell_attr.cell_offset_x+cell_attr.ss/2,
-			cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
-		];
+	this.getCertainPointOfCell=function(cell_attr,type){
+		if(type==='center_of_cell'){
+			return [
+				cell_attr.cell_offset_x+cell_attr.ss/2,
+				cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
+			];
+		}
+		if(type==='score_dot'){
+			return [
+				cell_attr.cell_offset_x+cell_attr.ss*0.8,
+				cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
+			];
+		}
+		if(type==='SFN'){
+			return [
+				cell_attr.cell_offset_x+cell_attr.ss/2*0.1,
+				cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.25
+			];
+		}
 	}
 	this.debugDrawCellBorder=function(cell_attr){
 		this.setStrokeStyle("lightblue");
@@ -239,7 +253,7 @@ function SinriScoreDrawer(canvas_id){
 	this.printOneScoreCellWithPureString=function(cell_attr,score){
 		this.writeText(
 			score,
-			this.getPointOfCellCenter(cell_attr),
+			this.getCertainPointOfCell(cell_attr,'center_of_cell'),
 			{
 				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 				textAlign:'center',
@@ -286,7 +300,7 @@ function SinriScoreDrawer(canvas_id){
 		}
 		this.writeText(
 			note_text,
-			this.getPointOfCellCenter(cell_attr),
+			this.getCertainPointOfCell(cell_attr,'center_of_cell'),
 			{
 				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 				textAlign:(score.title?'left':'center'),
@@ -306,7 +320,7 @@ function SinriScoreDrawer(canvas_id){
 		if(sfn_char!==''){
 			this.writeText(
 				sfn_char,
-				[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.25],
+				this.getCertainPointOfCell(cell_attr,'SFN'),
 				{
 					font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 					textAlign:'center',
@@ -317,7 +331,7 @@ function SinriScoreDrawer(canvas_id){
 
 		if(score.dot){
 			this.drawDot(
-				[cell_attr.cell_offset_x+cell_attr.ss*0.8,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5],
+				this.getCertainPointOfCell(cell_attr,'score_dot'),
 				2
 			);
 		}
