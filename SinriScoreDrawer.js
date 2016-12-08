@@ -53,6 +53,14 @@ function SinriScoreDrawer(canvas_id){
 			tmp_canvas.remove();//see above Polyfill code
 
 			return result;
+		},
+		DOWNLOAD_URL:function(url){
+			let a = document.createElement('a');
+			let filename = 'SinriScoreDrawer_Untitled.png';
+			a.href = url;
+			a.download = filename;
+			a.click();
+			window.URL.revokeObjectURL(url);
 		}
 	}
 	
