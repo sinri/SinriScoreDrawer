@@ -11,18 +11,18 @@
 */
 function SinriScoreDrawer(canvas_id){
 	// Helper
-	this.E=function(id){
+	this.helper={
+		E:function(id){
 		return document.getElementById(id);
-	}
-	this.P=function(x,y){
-		return {x:x,y:y};
-	}
-	this.INC=function(obj,delta){
-		if(!obj){
-			obj=0;
+		},
+		INC:function(obj,delta){
+			if(!obj){
+				obj=0;
+			}
+			return obj+delta;
 		}
-		return obj+delta;
 	}
+	
 	// Canvas
 	this.setStrokeStyle=function(style){
 		this.canvas.getContext("2d").strokeStyle = style;
@@ -586,14 +586,14 @@ function SinriScoreDrawer(canvas_id){
 				flag=8;//\
 			}
 		}else if(c==='<' && flag===3){
-			note.underpoints=this.INC(note.underpoints,1);
+			note.underpoints=this.helper.INC(note.underpoints,1);
 		}else if(c==='>' && flag===3){
-			note.upperpoints=this.INC(note.upperpoints,1);
+			note.upperpoints=this.helper.INC(note.upperpoints,1);
 		}else if(c==='.' && flag===3){
 			note.dot=true;
 			flag=4;//has dot
 		}else if(c==='_' && (flag===3 || flag===5)){
-			note.underlines=this.INC(note.underlines,1);
+			note.underlines=this.helper.INC(note.underlines,1);
 			flag=5;//has underlines
 		}else if(c==='-' && (flag===3 || flag===6)){
 			note._has_long_line+=1;
@@ -651,5 +651,5 @@ function SinriScoreDrawer(canvas_id){
 
 
 	// initialize
-	this.canvas=this.E(canvas_id);
+	this.canvas=this.helper.E(canvas_id);
 }
