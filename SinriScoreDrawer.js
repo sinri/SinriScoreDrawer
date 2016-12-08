@@ -73,19 +73,19 @@ function SinriScoreDrawer(canvas_id){
 		var point_end=[point_end_x,point_y];
 		var delta_y=0;
 
-		var keep_method='bezierCurve';
+		// var keep_method='bezierCurve';
 		
-		if(keep_method==='arc'){// use arcTo
-			var k=point_end_x-point_start_x;
-			var r=(4*omega*omega+k*k)/(8*omega);
-			delta_y=r-omega;
-			var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
+		// if(keep_method==='arc'){// use arcTo
+		// 	var k=point_end_x-point_start_x;
+		// 	var r=(4*omega*omega+k*k)/(8*omega);
+		// 	delta_y=r-omega;
+		// 	var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
 
-			ctx.moveTo(point_start[0], point_start[1]);
-			ctx.arcTo(point_top[0],point_top[1],point_end[0],point_end[1],r);
-			ctx.stroke();
-		}
-		else if(keep_method==='bezierCurve'){// use bezierCurveTo
+		// 	ctx.moveTo(point_start[0], point_start[1]);
+		// 	ctx.arcTo(point_top[0],point_top[1],point_end[0],point_end[1],r);
+		// 	ctx.stroke();
+		// }
+		// else if(keep_method==='bezierCurve'){// use bezierCurveTo
 			var delta_x=(point_end_x-point_start_x)/4.0;
 			delta_y=omega*0.8;
 			ctx.moveTo(point_start[0], point_start[1]);
@@ -95,7 +95,7 @@ function SinriScoreDrawer(canvas_id){
 				point_end_x, point_y
 			);
 			ctx.stroke();
-		}
+		// }
 
 		if(triplets){
 			this.writeText('3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
@@ -115,20 +115,29 @@ function SinriScoreDrawer(canvas_id){
 		}
 		if(requirements && requirements.stroke){
 			ctx.strokeText(text,point_base[0],point_base[1]);
-		}else{
-			ctx.fillText(text,point_base[0],point_base[1]);
+			return;
 		}
-		
+
+		ctx.fillText(text,point_base[0],point_base[1]);		
 	}
 	// 按照编译完的对象制图
 	/**
 	 * @param score_data as array
 	 */
 	this.loadScoreData=function(score_data,cell_size,no_auto_canvas_size){
-		var score_size=this.getScoreSize(score_data);
+		let score_size=this.getScoreSize(score_data);
 
-		var s=40,ss=40,k=24,kk=24;
+		let s=40,ss=40,k=24,kk=24;
 
+		{
+			//default config
+			let s_from_h=parseInt(Math.floor(1.0*this.canvas.height/score_size.h),10);
+			let s_from_w=parseInt(Math.floor(1.0*this.canvas.width/score_size.w),10);
+			s=Math.min(s_from_w,s_from_h);
+			k=parseInt(Math.floor(s*0.6),10);
+			ss=s;
+			kk=k;
+		}
 		if(cell_size && cell_size.width && cell_size.height){
 			ss=cell_size.width;
 			s=cell_size.height;
@@ -140,25 +149,17 @@ function SinriScoreDrawer(canvas_id){
 				this.canvas.height=score_size.h*s;
 				this.canvas.width=score_size.w*ss;
 			}
-
-		}else{
-			var s_from_h=parseInt(Math.floor(1.0*this.canvas.height/score_size.h),10);
-			var s_from_w=parseInt(Math.floor(1.0*this.canvas.width/score_size.w),10);
-			s=Math.min(s_from_w,s_from_h);
-			k=parseInt(Math.floor(s*0.6),10);
-			ss=s;
-			kk=k;
 		}
 
-		var entire_offset={
+		let entire_offset={
 			x:parseInt(Math.floor((1.0*this.canvas.width-ss*(score_size.w))/2),10),
 			y:0
 		};
 
 		for(let y=0;y<score_size.h-2;y++){
-			var score_line=score_data[y];
+			let score_line=score_data[y];
 			this.keep_sign_set=[];
-			for(var x=0;x<score_size.w-2;x++){
+			for(let x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
 					let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
 					let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
@@ -176,7 +177,7 @@ function SinriScoreDrawer(canvas_id){
 				}
 			}
 			for(let keep_index=0;keep_index<this.keep_sign_set.length;keep_index++){
-				var keep_info=this.keep_sign_set[keep_index];
+				let keep_info=this.keep_sign_set[keep_index];
 				if(keep_info && keep_info.start && keep_info.end){
 					this.drawArcForKeep(
 						keep_info.start.x,
@@ -370,11 +371,11 @@ function SinriScoreDrawer(canvas_id){
 		let underline_y=cell_attr.cell_offset_y+cell_attr.t+cell_attr.k+3;
 
 		//under lines
-		let underlines=score.underlines;
+		let underlines=(score.underlines?parseInt(score.underlines,10):0);
 		if(score.triplets){
 			underlines=1;
 		}
-		if(underlines && underlines>0){
+		if(underlines>0){
 			for(let i=0;i<underlines;i++){
 				this.drawLine(
 					[cell_attr.cell_offset_x,underline_y],
@@ -384,8 +385,8 @@ function SinriScoreDrawer(canvas_id){
 			}
 		}
 		//under points
-		let underpoints=score.underpoints;
-		if(underpoints && underpoints>0){
+		let underpoints=(score.underpoints?parseInt(score.underpoints,10):0);
+		if(underpoints>0){
 			underline_y=underline_y+1;
 			for(let i=0;i<underpoints;i++){
 				this.drawDot(
@@ -399,9 +400,12 @@ function SinriScoreDrawer(canvas_id){
 		return underline_y;
 	}
 	this.printOneScoreCellWithObjectForKeep=function(cell_attr,score,upper_y){
-		let triplets=false;
-		if(score.triplets){
-			triplets=score.triplets;
+		let triplets=(score.triplets?score.triplets:false);
+		let s_or_e='';
+		if(score.keep_start){
+			s_or_e='start';
+		}else if(score.keep_end){
+			s_or_e='end';
 		}
 		if(score.keep_start && score.keep_end){
 			this.drawArcForKeep(
@@ -410,29 +414,26 @@ function SinriScoreDrawer(canvas_id){
 				upper_y,
 				cell_attr.ss*0.9*0.2
 			);
-		}else{
-			if((this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end){
-				let s_or_e='';
-				if(score.keep_start){
-					s_or_e='start';
-				}else if(score.keep_end){
-					s_or_e='end';
-				}
-				this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
+			return;
+		}
+		if((this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end){
+			this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
+				x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
+				y:upper_y,
+				triplets:triplets
+			};
+			return;
+		}
+		if(score.keep_start){
+			this.keep_sign_set.push({
+				start:{
 					x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 					y:upper_y,
 					triplets:triplets
-				};
-			}else if(score.keep_start){
-				this.keep_sign_set.push({
-					start:{
-						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
-						y:upper_y,
-						triplets:triplets
-					}
-				});
-			}
-		}
+				}
+			});
+			return;
+		}		
 	}
 	//////
 	/**
