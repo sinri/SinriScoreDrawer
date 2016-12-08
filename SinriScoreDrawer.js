@@ -9,11 +9,20 @@
 * For debug, you can get the notes in the format of JSON Array with this
 	var the_score_data=SSD.parseScoreString(textarea.value);
 */
+
+if (!('remove' in Element.prototype)) {
+    Element.prototype.remove = function() {
+        if (this.parentNode) {
+            this.parentNode.removeChild(this);
+        }
+    };	
+}
+
 function SinriScoreDrawer(canvas_id){
 	// Helper
 	this.helper={
 		E:function(id){
-		return document.getElementById(id);
+			return document.getElementById(id);
 		},
 		INC:function(obj,delta){
 			if(!obj){
@@ -29,10 +38,28 @@ function SinriScoreDrawer(canvas_id){
 				return null;
 			}
 			return array[array.length-1];
+		},
+		PARSE_TO_DATA_URL:function(score_text){
+			let tmp_canvas_id='SinriScoreDrawer_TMP_CANVAS_OF_'+(new Date().getTime());
+			let tmp_canvas=document.createElement('canvas');
+			tmp_canvas.setAttribute('id',tmp_canvas_id);
+			document.body.insertAdjacentElement('beforeend',tmp_canvas);
+
+			let SSD=new SinriScoreDrawer(tmp_canvas_id);
+			let the_score_data=SSD.parseScoreString(score_text);
+			SSD.loadScoreData(the_score_data,{width:30,height:50});
+			let result = SSD.toDataUrl();
+
+			tmp_canvas.remove();//see above Polyfill code
+
+			return result;
 		}
 	}
 	
 	// Canvas
+	this.toDataUrl=function(){
+		return this.canvas.toDataURL();
+	}
 	this.setStrokeStyle=function(style){
 		this.canvas.getContext("2d").strokeStyle = style;
 	}
@@ -656,5 +683,8 @@ function SinriScoreDrawer(canvas_id){
 
 
 	// initialize
+	if(!canvas_id){
+		return this;
+	}
 	this.canvas=this.helper.E(canvas_id);
 }

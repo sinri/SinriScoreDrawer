@@ -5,12 +5,16 @@
 	<title>SinriScoreDrawer Example</title>
 	<script src="./SinriScoreDrawer.js"></script>
 	<script type="text/javascript">
+		
 		function parse_and_draw_score_text(){
 			var SSD=new SinriScoreDrawer('myCanvas');
 			var textarea=SSD.helper.E('ta');
 			var the_score_data=SSD.parseScoreString(textarea.value);
 			SSD.helper.E('parsed_json').value=JSON.stringify(the_score_data,null,2);
 			SSD.loadScoreData(the_score_data,{width:30,height:50});
+		}
+		function getImageDataUrl(){
+			SinriScoreDrawer().helper.E('parsed_json').value=SinriScoreDrawer().helper.PARSE_TO_DATA_URL(SinriScoreDrawer().helper.E('ta').value);
 		}
 	</script>
 	<style type="text/css">
@@ -24,6 +28,12 @@
 		#btn_p{
 			padding: 5px;
 			background: #039aff;
+			color: white;
+			border: none;
+		}
+		#btn_s{
+			padding: 5px;
+			background: #230a3f;
 			color: white;
 			border: none;
 		}
@@ -46,6 +56,7 @@
 	<div id="header">
 		<a href="https://github.com/sinri/SinriScoreDrawer">SinriScoreDrawer</a> Example ↓ Write score below and click button to see result.
 		<button id="btn_p" onclick='parse_and_draw_score_text()'>Parse and Draw Score Text</button>
+		<button id="btn_s" onclick="getImageDataUrl()">Get image DataUrl</button>
 	</div>
 	<div id="edit_pane">		
 		<textarea id="ta">~ 1=D 4/4　　　　　　选本129首　　　　　　父的启示

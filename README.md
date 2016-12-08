@@ -1,7 +1,9 @@
 # SinriScoreDrawer
 A tool to parse and draw numbered musical notation with lyrics.
+
 [![Code Climate](https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/gpa.svg)](https://codeclimate.com/github/sinri/SinriScoreDrawer)
 [![Issue Count](https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/issue_count.svg)](https://codeclimate.com/github/sinri/SinriScoreDrawer)
+GitHub Raw File CDN[https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js](https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js)
 
 ## 缘起
 
