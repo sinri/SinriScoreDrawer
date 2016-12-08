@@ -409,26 +409,22 @@ function SinriScoreDrawer(canvas_id){
 		if(score.triplets){
 			underlines=1;
 		}
-		if(underlines>0){
-			for(let i=0;i<underlines;i++){
-				this.drawLine(
-					[cell_attr.cell_offset_x,underline_y],
-					[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
-				);
-				underline_y=underline_y+3;
-			}
+		for(let i=0;underlines>0 && i<underlines;i++){
+			this.drawLine(
+				[cell_attr.cell_offset_x,underline_y],
+				[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
+			);
+			underline_y=underline_y+3;
 		}
 		//under points
 		let underpoints=(score.underpoints?parseInt(score.underpoints,10):0);
-		if(underpoints>0){
-			underline_y=underline_y+1;
-			for(let i=0;i<underpoints;i++){
-				this.drawDot(
-					[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
-					2
-				);
-				underline_y=underline_y+6;
-			}
+		underline_y=underline_y+1;
+		for(let i=0;underpoints>0 && i<underpoints;i++){
+			this.drawDot(
+				[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
+				2
+			);
+			underline_y=underline_y+6;
 		}
 
 		return underline_y;
