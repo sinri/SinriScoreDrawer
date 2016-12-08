@@ -59,7 +59,7 @@ function SinriScoreDrawer(canvas_id){
 			var ep=points[i];
 			ctx.lineTo(ep[0],ep[1]);
 		}
-		ctx.closePath();//ctx.lineTo(sp[0],ep[1]);
+		ctx.closePath();
 		ctx.stroke();
 	}
 	this.drawCircle=function(point_center,radius,method){
@@ -81,35 +81,21 @@ function SinriScoreDrawer(canvas_id){
 		var point_start=[point_start_x,point_y];
 		var point_end=[point_end_x,point_y];
 		var delta_y=0;
-
-		// var keep_method='bezierCurve';
 		
-		// if(keep_method==='arc'){// use arcTo
-		// 	var k=point_end_x-point_start_x;
-		// 	var r=(4*omega*omega+k*k)/(8*omega);
-		// 	delta_y=r-omega;
-		// 	var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
-
-		// 	ctx.moveTo(point_start[0], point_start[1]);
-		// 	ctx.arcTo(point_top[0],point_top[1],point_end[0],point_end[1],r);
-		// 	ctx.stroke();
-		// }
-		// else if(keep_method==='bezierCurve'){// use bezierCurveTo
-			var delta_x=(point_end_x-point_start_x)/4.0;
-			delta_y=omega*0.8;
-			ctx.moveTo(point_start[0], point_start[1]);
-			ctx.bezierCurveTo(
-				point_start_x+delta_x, point_y-delta_y, 
-				point_end_x-delta_x, point_y-delta_y, 
-				point_end_x, point_y
-			);
-			ctx.stroke();
-		// }
+		var delta_x=(point_end_x-point_start_x)/4.0;
+		delta_y=omega*0.8;
+		ctx.moveTo(point_start[0], point_start[1]);
+		ctx.bezierCurveTo(
+			point_start_x+delta_x, point_y-delta_y, 
+			point_end_x-delta_x, point_y-delta_y, 
+			point_end_x, point_y
+		);
+		ctx.stroke();
 
 		if(triplets){
 			this.writeText('3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
 				font:''+omega*1.5+'px monospace',
-				// textAlign:'center',
+				// textAlign:'center',//这里不知道为啥
 				textBaseline:'middle'
 			});
 		}
@@ -215,26 +201,14 @@ function SinriScoreDrawer(canvas_id){
 		if(type==='center_of_cell'){
 			p_x=0.5;
 			p_y=0.5;
-			// return [
-			// 	cell_attr.cell_offset_x+cell_attr.ss/2,
-			// 	cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
-			// ];
 		}
 		if(type==='score_dot'){
 			p_x=0.8;
 			p_y=0.5;
-			// return [
-			// 	cell_attr.cell_offset_x+cell_attr.ss*0.8,
-			// 	cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
-			// ];
 		}
 		if(type==='SFN'){
 			p_x=0.05;
 			p_y=0.25;
-			// return [
-			// 	cell_attr.cell_offset_x+cell_attr.ss/2*0.1,
-			// 	cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.25
-			// ];
 		}
 		return [
 			cell_attr.cell_offset_x+cell_attr.ss*p_x,
@@ -437,23 +411,12 @@ function SinriScoreDrawer(canvas_id){
 		}else if(score.keep_end){
 			s_or_e='end';
 		}
-		// if(score.keep_start && score.keep_end){
-		// 	this.drawArcForKeep(
-		// 		cell_attr.cell_offset_x+cell_attr.ss*0.1,
-		// 		cell_attr.cell_offset_x+cell_attr.ss*0.9,
-		// 		upper_y,
-		// 		cell_attr.ss*0.9*0.2
-		// 	);
-		// 	return;
-		// }
 
 		let last_sign_item=this.helper.LAST_OBJ_OF_ARRAY(this.keep_sign_set);
 
 		if(
-			// (this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end
 			last_sign_item && !last_sign_item.end
 		){
-			// this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
 			last_sign_item[s_or_e]={
 				x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 				y:upper_y,
@@ -518,7 +481,7 @@ function SinriScoreDrawer(canvas_id){
 		let line_data=[];
 		for(let note_index=0;note_index<notes.length;note_index++){
 			let note_results=this.parseNoteString(notes[note_index],type);
-			console.log("PARSE",notes[note_index],JSON.stringify(note_results));
+			// console.log("PARSE",notes[note_index],JSON.stringify(note_results));
 			for(let i=0;i<note_results.length;i++){
 				line_data.push(note_results[i]);
 			}
