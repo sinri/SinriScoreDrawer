@@ -124,10 +124,17 @@ function SinriScoreDrawer(canvas_id){
 
 		let s=40,ss=40,k=24,kk=24;
 
+		//default config
 		{
-			//default config
-			let s_from_h=parseInt(Math.floor(1.0*this.canvas.height/score_size.h),10);
-			let s_from_w=parseInt(Math.floor(1.0*this.canvas.width/score_size.w),10);
+			let inner_function_1=function(a,b){
+				return parseInt(Math.floor(1.0*a/b),10);
+			}
+			// let s_from_h=parseInt(Math.floor(1.0*this.canvas.height/score_size.h),10);
+			// let s_from_w=parseInt(Math.floor(1.0*this.canvas.width/score_size.w),10);
+
+			let s_from_h=inner_function_1(this.canvas.height,score_size.h);
+			let s_from_w=inner_function_1(this.canvas.width,score_size.w);
+
 			s=Math.min(s_from_w,s_from_h);
 			k=parseInt(Math.floor(s*0.6),10);
 			ss=s;
