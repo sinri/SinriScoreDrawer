@@ -202,24 +202,35 @@ function SinriScoreDrawer(canvas_id){
 		return {h:h,w:w};
 	}
 	this.getCertainPointOfCell=function(cell_attr,type){
+		let p_x=0.5,p_y=0.5;
 		if(type==='center_of_cell'){
-			return [
-				cell_attr.cell_offset_x+cell_attr.ss/2,
-				cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
-			];
+			p_x=0.5;
+			p_y=0.5;
+			// return [
+			// 	cell_attr.cell_offset_x+cell_attr.ss/2,
+			// 	cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
+			// ];
 		}
 		if(type==='score_dot'){
-			return [
-				cell_attr.cell_offset_x+cell_attr.ss*0.8,
-				cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
-			];
+			p_x=0.8;
+			p_y=0.5;
+			// return [
+			// 	cell_attr.cell_offset_x+cell_attr.ss*0.8,
+			// 	cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5
+			// ];
 		}
 		if(type==='SFN'){
-			return [
-				cell_attr.cell_offset_x+cell_attr.ss/2*0.1,
-				cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.25
-			];
+			p_x=0.05;
+			p_y=0.25;
+			// return [
+			// 	cell_attr.cell_offset_x+cell_attr.ss/2*0.1,
+			// 	cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.25
+			// ];
 		}
+		return [
+			cell_attr.cell_offset_x+cell_attr.ss*p_x,
+			cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*p_y;
+		];
 	}
 	this.debugDrawCellBorder=function(cell_attr){
 		this.setStrokeStyle("lightblue");
