@@ -20,6 +20,15 @@ function SinriScoreDrawer(canvas_id){
 				obj=0;
 			}
 			return obj+delta;
+		},
+		LAST_OBJ_OF_ARRAY:function(array){
+			if(!array){
+				return false;
+			}
+			if(array.length===0){
+				return null;
+			}
+			return array[array.length-1];
 		}
 	}
 	
@@ -432,17 +441,24 @@ function SinriScoreDrawer(canvas_id){
 		}else if(score.keep_end){
 			s_or_e='end';
 		}
-		if(score.keep_start && score.keep_end){
-			this.drawArcForKeep(
-				cell_attr.cell_offset_x+cell_attr.ss*0.1,
-				cell_attr.cell_offset_x+cell_attr.ss*0.9,
-				upper_y,
-				cell_attr.ss*0.9*0.2
-			);
-			return;
-		}
-		if((this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end){
-			this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
+		// if(score.keep_start && score.keep_end){
+		// 	this.drawArcForKeep(
+		// 		cell_attr.cell_offset_x+cell_attr.ss*0.1,
+		// 		cell_attr.cell_offset_x+cell_attr.ss*0.9,
+		// 		upper_y,
+		// 		cell_attr.ss*0.9*0.2
+		// 	);
+		// 	return;
+		// }
+
+		let last_sign_item=this.helper.LAST_OBJ_OF_ARRAY(this.keep_sign_set);
+
+		if(
+			// (this.keep_sign_set.length-1)>=0 && !this.keep_sign_set[(this.keep_sign_set.length-1)].end
+			last_sign_item && !last_sign_item.end
+		){
+			// this.keep_sign_set[(this.keep_sign_set.length-1)][s_or_e]={
+			last_sign_item[s_or_e]={
 				x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
 				y:upper_y,
 				triplets:triplets
