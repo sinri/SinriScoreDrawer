@@ -581,10 +581,8 @@ function SinriScoreDrawer(canvas_id){
 				flag=3;//has note
 			}else if(flag===7){
 				note._times_multiply=note._times_multiply*10+1*c;
-				flag=7;//*
 			}else if(flag===8){
 				note._times_divided=note._times_divided*10+1*c;
-				flag=8;//\
 			}
 		}else if(c==='<' && flag===3){
 			note.underpoints=this.helper.INC(note.underpoints,1);
@@ -608,7 +606,6 @@ function SinriScoreDrawer(canvas_id){
 			flag=9;
 		}else if(c==='~' && flag===3){
 			note.fermata=true;
-			flag=3;
 		}
 		return flag;
 	}
