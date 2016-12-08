@@ -2,51 +2,56 @@
 * SinriScoreDrawer
 * -----------------------
 * Load from score text to display numbered musical notation on a canvas element.
-	SinriScoreDrawer.loadScoreData(
-		SinriScoreDrawer.E(CANVAS_ID),
-		SinriScoreDrawer.parseScoreString(SCORE_TEXT),
-		{width:30,height:60}
-	);
+	var SSD=new SinriScoreDrawer('myCanvas');
+	var textarea=SSD.E('ta');
+	var the_score_data=SSD.parseScoreString(textarea.value);
+	SSD.loadScoreData(the_score_data,{width:30,height:50});
 * For debug, you can get the notes in the format of JSON Array with this
-	SinriScoreDrawer.parseScoreString(SCORE_TEXT);
+	var the_score_data=SSD.parseScoreString(textarea.value);
 */
-var SinriScoreDrawer={
-	E:function(id){
+function SinriScoreDrawer(canvas_id){
+	// Helper
+	this.helper={
+		E:function(id){
 		return document.getElementById(id);
-	},
-	P:function(x,y){
-		return {x:x,y:y};
-	},
-	INC:function(obj,delta){
-		if(!obj){
-			obj=0;
+		},
+		INC:function(obj,delta){
+			if(!obj){
+				obj=0;
+			}
+			return obj+delta;
+		},
+		LAST_OBJ_OF_ARRAY:function(array){
+			if(!array){
+				return false;
+			}
+			if(array.length===0){
+				return null;
+			}
+			return array[array.length-1];
 		}
-		return obj+delta;
-	},
-	/////
-	setStrokeStyle:function(canvas,style){
-		if(style){
-			canvas.getContext("2d").strokeStyle = style;
-		}
-	},
-	setFillStyle:function(canvas,style){
-		if(style){
-			canvas.getContext("2d").fillStyle = style;
-		}
-	},
-	drawLine:function(canvas,point_start,point_end){
-		var ctx = canvas.getContext("2d");
+	}
+	
+	// Canvas
+	this.setStrokeStyle=function(style){
+		this.canvas.getContext("2d").strokeStyle = style;
+	}
+	this.setFillStyle=function(style){
+		this.canvas.getContext("2d").fillStyle = style;
+	}
+	this.drawLine=function(point_start,point_end){
+		var ctx = this.canvas.getContext("2d");
 		ctx.beginPath();
 		ctx.moveTo(point_start[0],point_start[1]);
 		ctx.lineTo(point_end[0],point_end[1]);
 		ctx.closePath();
 		ctx.stroke();
-	},
-	drawPolygon:function(canvas,points){
+	}
+	this.drawPolygon=function(points){
 		if(!points||points.length<=2){
 			return false;
 		}
-		var ctx = canvas.getContext("2d");
+		var ctx = this.canvas.getContext("2d");
 		ctx.beginPath();
 		var sp=points[0];
 		ctx.moveTo(sp[0],sp[1]);
@@ -54,11 +59,11 @@ var SinriScoreDrawer={
 			var ep=points[i];
 			ctx.lineTo(ep[0],ep[1]);
 		}
-		ctx.closePath();//ctx.lineTo(sp[0],ep[1]);
+		ctx.closePath();
 		ctx.stroke();
-	},
-	drawCircle:function(canvas,point_center,radius,method){
-		var ctx = canvas.getContext("2d");
+	}
+	this.drawCircle=function(point_center,radius,method){
+		var ctx = this.canvas.getContext("2d");
 		ctx.beginPath();
 		ctx.arc(point_center[0],point_center[1],radius,0,2*Math.PI);
 		ctx.closePath();
@@ -67,50 +72,36 @@ var SinriScoreDrawer={
 			return;
 		}
 		ctx.stroke();
-	},
-	drawDot:function(canvas,point_center,radius){
-		SinriScoreDrawer.drawCircle(canvas,point_center,radius,'fill');
-	},
-	drawArcForKeep:function(canvas,point_start_x,point_end_x,point_y,omega,triplets){
-		var ctx = canvas.getContext("2d");
+	}
+	this.drawDot=function(point_center,radius){
+		this.drawCircle(point_center,radius,'fill');
+	}
+	this.drawArcForKeep=function(point_start_x,point_end_x,point_y,omega,triplets){
+		var ctx = this.canvas.getContext("2d");
 		var point_start=[point_start_x,point_y];
 		var point_end=[point_end_x,point_y];
 		var delta_y=0;
-
-		var keep_method='bezierCurve';
 		
-		if(keep_method==='arc'){// use arcTo
-			var k=point_end_x-point_start_x;
-			var r=(4*omega*omega+k*k)/(8*omega);
-			delta_y=r-omega;
-			var point_top=[(point_start_x+point_end_x)/2,point_y-delta_y];
-
-			ctx.moveTo(point_start[0], point_start[1]);
-			ctx.arcTo(point_top[0],point_top[1],point_end[0],point_end[1],r);
-			ctx.stroke();
-		}
-		else if(keep_method==='bezierCurve'){// use bezierCurveTo
-			var delta_x=(point_end_x-point_start_x)/4.0;
-			delta_y=omega*0.8;
-			ctx.moveTo(point_start[0], point_start[1]);
-			ctx.bezierCurveTo(
-				point_start_x+delta_x, point_y-delta_y, 
-				point_end_x-delta_x, point_y-delta_y, 
-				point_end_x, point_y
-			);
-			ctx.stroke();
-		}
+		var delta_x=(point_end_x-point_start_x)/4.0;
+		delta_y=omega*0.8;
+		ctx.moveTo(point_start[0], point_start[1]);
+		ctx.bezierCurveTo(
+			point_start_x+delta_x, point_y-delta_y, 
+			point_end_x-delta_x, point_y-delta_y, 
+			point_end_x, point_y
+		);
+		ctx.stroke();
 
 		if(triplets){
-			SinriScoreDrawer.writeText(canvas,'3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
+			this.writeText('3',[(point_start_x+point_end_x)/2,point_y-delta_y*0.3],{
 				font:''+omega*1.5+'px monospace',
-				// textAlign:'center',
+				// textAlign:'center',//这里不知道为啥
 				textBaseline:'middle'
 			});
 		}
-	},
-	writeText:function(canvas,text,point_base,requirements){
-		var ctx = canvas.getContext("2d");
+	}
+	this.writeText=function(text,point_base,requirements){
+		var ctx = this.canvas.getContext("2d");
 		ctx.font = "30px Arial";
 		if(requirements){
 			if(requirements.font)ctx.font=requirements.font;
@@ -119,20 +110,29 @@ var SinriScoreDrawer={
 		}
 		if(requirements && requirements.stroke){
 			ctx.strokeText(text,point_base[0],point_base[1]);
-		}else{
-			ctx.fillText(text,point_base[0],point_base[1]);
+			return;
 		}
-		
-	},
-	/////
+
+		ctx.fillText(text,point_base[0],point_base[1]);		
+	}
+	// 按照编译完的对象制图
 	/**
 	 * @param score_data as array
 	 */
-	loadScoreData:function(canvas,score_data,cell_size,no_auto_canvas_size){
-		var score_size=SinriScoreDrawer.getScoreSize(score_data);
+	this.loadScoreData=function(score_data,cell_size,no_auto_canvas_size){
+		let score_size=this.getScoreSize(score_data);
 
-		var s=40,ss=40,k=24,kk=24;
+		let s=40,ss=40,k=24,kk=24;
 
+		{
+			//default config
+			let s_from_h=parseInt(Math.floor(1.0*this.canvas.height/score_size.h),10);
+			let s_from_w=parseInt(Math.floor(1.0*this.canvas.width/score_size.w),10);
+			s=Math.min(s_from_w,s_from_h);
+			k=parseInt(Math.floor(s*0.6),10);
+			ss=s;
+			kk=k;
+		}
 		if(cell_size && cell_size.width && cell_size.height){
 			ss=cell_size.width;
 			s=cell_size.height;
@@ -141,45 +141,40 @@ var SinriScoreDrawer={
 
 			//modify canvas
 			if(!no_auto_canvas_size){
-				canvas.height=score_size.h*s;
-				canvas.width=score_size.w*ss;
+				this.canvas.height=score_size.h*s;
+				this.canvas.width=score_size.w*ss;
 			}
-
-		}else{
-			var s_from_h=parseInt(Math.floor(1.0*canvas.height/score_size.h),10);
-			var s_from_w=parseInt(Math.floor(1.0*canvas.width/score_size.w),10);
-			s=Math.min(s_from_w,s_from_h);
-			k=parseInt(Math.floor(s*0.6),10);
-			ss=s;
-			kk=k;
 		}
 
-		var entire_offset={
-			x:parseInt(Math.floor((1.0*canvas.width-ss*(score_size.w))/2),10),
+		let entire_offset={
+			x:parseInt(Math.floor((1.0*this.canvas.width-ss*(score_size.w))/2),10),
 			y:0
 		};
 
 		for(let y=0;y<score_size.h-2;y++){
-			var score_line=score_data[y];
-			SinriScoreDrawer.keep_sign_set=[];
-			for(var x=0;x<score_size.w-2;x++){
+			let score_line=score_data[y];
+			this.keep_sign_set=[];
+			for(let x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
-					SinriScoreDrawer.printOneScoreCell(canvas,{
+					let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
+					let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
+					this.printOneScoreCell({
 						s:s,//cell's total height
 						k:k,//char area height
 						ss:ss,//cell's total width
 						kk:kk,//char area width
 						cell_offset_x:(entire_offset.x+ss*x+ss),
 						cell_offset_y:(s*y+s),
-						score_size:score_size
+						score_size:score_size,
+						t:t,
+						tt:tt
 					},score_line[x]);
 				}
 			}
-			for(let keep_index=0;keep_index<SinriScoreDrawer.keep_sign_set.length;keep_index++){
-				var keep_info=SinriScoreDrawer.keep_sign_set[keep_index];
+			for(let keep_index=0;keep_index<this.keep_sign_set.length;keep_index++){
+				let keep_info=this.keep_sign_set[keep_index];
 				if(keep_info && keep_info.start && keep_info.end){
-					SinriScoreDrawer.drawArcForKeep(
-						canvas,
+					this.drawArcForKeep(
 						keep_info.start.x,
 						keep_info.end.x,
 						Math.max(keep_info.start.y,keep_info.end.y),
@@ -189,8 +184,8 @@ var SinriScoreDrawer={
 				}
 			}
 		}
-	},
-	getScoreSize:function(score_data){
+	}
+	this.getScoreSize=function(score_data){
 		var h=score_data.length+2;
 		var w=0;
 		for(let i=0;i<score_data.length;i++){
@@ -200,243 +195,246 @@ var SinriScoreDrawer={
 		}
 		w+=2;
 		return {h:h,w:w};
-	},
-	getPointOfCellCenter:function(cell_attr){
-		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
-		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
-		return [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5];
-	},
-	printOneScoreCell:function(canvas,cell_attr,score,show_cell_border){
-		let t=parseInt(Math.floor((cell_attr.s-cell_attr.k)/2.0),10);//char outside space height
-		let tt=parseInt(Math.floor((cell_attr.ss-cell_attr.kk)/2.0),10);//char outside space width
+	}
+	this.getCertainPointOfCell=function(cell_attr,type){
+		let p_x=0.5,p_y=0.5;
+		if(type==='center_of_cell'){
+			p_x=0.5;
+			p_y=0.5;
+		}
+		if(type==='score_dot'){
+			p_x=0.8;
+			p_y=0.5;
+		}
+		if(type==='SFN'){
+			p_x=0.05;
+			p_y=0.25;
+		}
+		return [
+			cell_attr.cell_offset_x+cell_attr.ss*p_x,
+			cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*p_y
+		];
+	}
+	this.debugDrawCellBorder=function(cell_attr){
+		this.setStrokeStyle("lightblue");
+		this.drawPolygon([
+			[cell_attr.cell_offset_x,cell_attr.cell_offset_y],
+			[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y],
+			[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y+cell_attr.s],
+			[cell_attr.cell_offset_x,cell_attr.cell_offset_y+cell_attr.s]
+		]);
+		this.setStrokeStyle("lightgray");
+		this.drawPolygon([
+			[cell_attr.cell_offset_x+cell_attr.tt,cell_attr.cell_offset_y+cell_attr.t],
+			[cell_attr.cell_offset_x+cell_attr.tt+cell_attr.kk,cell_attr.cell_offset_y+cell_attr.t],
+			[cell_attr.cell_offset_x+cell_attr.tt+cell_attr.kk,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k],
+			[cell_attr.cell_offset_x+cell_attr.tt,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k]
+		]);
+	}
+	this.printOneScoreCell=function(cell_attr,score,show_cell_border){
 		if(show_cell_border){
-			SinriScoreDrawer.setStrokeStyle(canvas,"lightblue");
-			SinriScoreDrawer.drawPolygon(canvas,[
-				[cell_attr.cell_offset_x,cell_attr.cell_offset_y],
-				[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y],
-				[cell_attr.cell_offset_x+cell_attr.ss,cell_attr.cell_offset_y+cell_attr.s],
-				[cell_attr.cell_offset_x,cell_attr.cell_offset_y+cell_attr.s]
-			]);
-			SinriScoreDrawer.setStrokeStyle(canvas,"lightgray");
-			SinriScoreDrawer.drawPolygon(canvas,[
-				[cell_attr.cell_offset_x+tt,cell_attr.cell_offset_y+t],
-				[cell_attr.cell_offset_x+tt+cell_attr.kk,cell_attr.cell_offset_y+t],
-				[cell_attr.cell_offset_x+tt+cell_attr.kk,cell_attr.cell_offset_y+t+cell_attr.k],
-				[cell_attr.cell_offset_x+tt,cell_attr.cell_offset_y+t+cell_attr.k]
-			]);
+			this.debugDrawCellBorder(cell_attr);
 		}	
-		SinriScoreDrawer.setStrokeStyle(canvas,"black");
-		SinriScoreDrawer.setFillStyle(canvas,"black");
+		this.setStrokeStyle("black");
+		this.setFillStyle("black");
 
 		if(typeof score === 'string'){
-			SinriScoreDrawer.writeText(
-				canvas,score[0],
-				// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-				SinriScoreDrawer.getPointOfCellCenter(cell_attr),
+			this.printOneScoreCellWithPureString(cell_attr,score[0]);
+		}else{
+			this.printOneScoreCellWithObject(cell_attr,score);
+		}
+	}
+	this.printOneScoreCellWithPureString=function(cell_attr,score){
+		this.writeText(
+			score,
+			this.getCertainPointOfCell(cell_attr,'center_of_cell'),
+			{
+				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+				textAlign:'center',
+				textBaseline:'middle'
+			}
+		);
+	}
+	this.printOneScoreCellWithObject=function(cell_attr,score){
+		//note
+		this.printOneScoreCellWithObjectForText(cell_attr,score);
+
+		// SFND
+		this.printOneScoreCellWithObjectForSFN(cell_attr,score);
+
+		//upper part
+		let upper_y=this.printOneScoreCellWithObjectForUpper(cell_attr,score);
+
+		//under part
+		let underline_y=this.printOneScoreCellWithObjectForUnder(cell_attr,score);
+
+		//keep
+		this.printOneScoreCellWithObjectForKeep(cell_attr,score,upper_y);
+	}
+	this.printOneScoreCellWithObjectForText=function(cell_attr,score){
+		let note_text='';
+		if(score.note){
+			note_text=score.note[0];
+		}
+		if(score.special_note){
+			let mp={
+				'REPEAT_START_DOUBLE':"‖:",
+				'REPEAT_END_DOUBLE':":‖",
+				'REPEAT_START_SINGLE':"|:",
+				'REPEAT_END_SINGLE':":|",
+				'LONGER_LINE':"ー",
+				'FIN':"‖",
+				'PHARSE_FIN':"|"
+			}
+			if(score.special_note==='AS_IS' && score.note){
+				note_text=score.note;
+			}else if(mp[score.special_note]){
+				note_text=mp[score.special_note];
+			}
+		}
+		this.writeText(
+			note_text,
+			this.getCertainPointOfCell(cell_attr,'center_of_cell'),
+			{
+				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+				textAlign:(score.title?'left':'center'),
+				textBaseline:'middle'
+			}
+		);
+	}
+	this.printOneScoreCellWithObjectForSFN=function(cell_attr,score){
+		let sfn_char='';
+		if(score.sharp){
+			sfn_char='♯';
+		}else if(score.flat){
+			sfn_char='♭';
+		}else if(score.natual){
+			sfn_char='♮';
+		}
+		if(sfn_char!==''){
+			this.writeText(
+				sfn_char,
+				this.getCertainPointOfCell(cell_attr,'SFN'),
 				{
-					font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+					font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
 					textAlign:'center',
 					textBaseline:'middle'
 				}
 			);
-		}else{
-			//note
-			var note_text='';
-			if(score.note){
-				note_text=score.note[0];
-			}
-			if(score.special_note){
-				let mp={
-					'REPEAT_START_DOUBLE':"‖:",
-					'REPEAT_END_DOUBLE':":‖",
-					'REPEAT_START_SINGLE':"|:",
-					'REPEAT_END_SINGLE':":|",
-					'LONGER_LINE':"ー",
-					'FIN':"‖",
-					'PHARSE_FIN':"|"
-				}
-				if(score.special_note==='AS_IS' && score.note){
-					note_text=score.note;
-				}else if(mp[score.special_note]){
-					note_text=mp[score.special_note];
-				}
-			}
-			if(score.title){
-				SinriScoreDrawer.writeText(
-					canvas,
-					note_text,
-					// [cell_attr.ss+0*cell_attr.score_size.w*cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					SinriScoreDrawer.getPointOfCellCenter(cell_attr),
-					{
-						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'left',
-						textBaseline:'middle'
-					}
-				);
-			}else{
-				SinriScoreDrawer.writeText(
-					canvas,
-					note_text,
-					// [cell_attr.cell_offset_x+cell_attr.ss/2,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					SinriScoreDrawer.getPointOfCellCenter(cell_attr),
-					{
-						font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'center',
-						textBaseline:'middle'
-					}
-				);
-			}
-			
+		}
 
-			// sharp ♯ and flat ♭
-			var sfn_char='';
-			if(score.sharp){
-				sfn_char='♯';
-			}else if(score.flat){
-				sfn_char='♭';
-			}else if(score.natual){
-				sfn_char='♮';
-			}
-			if(sfn_char!==''){
-				SinriScoreDrawer.writeText(
-					canvas,
-					sfn_char,
-					[cell_attr.cell_offset_x+cell_attr.ss/2*0.1,cell_attr.cell_offset_y+t+cell_attr.k*0.25],
-					{
-						font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
-						textAlign:'center',
-						textBaseline:'middle'
-					}
-				);
-			}
+		if(score.dot){
+			this.drawDot(
+				this.getCertainPointOfCell(cell_attr,'score_dot'),
+				2
+			);
+		}
+	}
+	this.printOneScoreCellWithObjectForUpper=function(cell_attr,score){
+		let upper_y=cell_attr.cell_offset_y+cell_attr.t;
 
-			if(score.dot){
-				SinriScoreDrawer.drawDot(
-					canvas,
-					[cell_attr.cell_offset_x+cell_attr.ss*0.8,cell_attr.cell_offset_y+t+cell_attr.k*0.5],
-					2
-				);
-			}
-
-			//upper part
-
-			var upper_y=cell_attr.cell_offset_y+t;
-
-			//upper points
-			var upperpoints=score.upperpoints;
-			if(upperpoints && upperpoints>0){
-				upper_y=upper_y-1;
-				for(let i=0;i<upperpoints;i++){
-					SinriScoreDrawer.drawDot(
-						canvas,
-						[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
-						2
-					);
-					upper_y=upper_y-6;
-				}
-			}
-
-			if(score.fermata){// /.\
-				SinriScoreDrawer.drawArcForKeep(
-					canvas,
-					cell_attr.cell_offset_x+cell_attr.ss*0.1,
-					cell_attr.cell_offset_x+cell_attr.ss*0.9,
-					upper_y-3,
-					cell_attr.ss*0.9*0.2
-				);
-				SinriScoreDrawer.drawDot(
-					canvas,
+		//upper points
+		let upperpoints=score.upperpoints;
+		if(upperpoints && upperpoints>0){
+			upper_y=upper_y-1;
+			for(let i=0;i<upperpoints;i++){
+				this.drawDot(
 					[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
 					2
 				);
 				upper_y=upper_y-6;
 			}
-
-			if(score.effect_word){
-				SinriScoreDrawer.writeText(
-					canvas,
-					score.effect_word,
-					[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
-					{
-						font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
-						textAlign:'left',
-						textBaseline:'middle'
-					}
-				);
-				upper_y=upper_y-6;
-			}
-
-			//under part
-
-			var underline_y=cell_attr.cell_offset_y+t+cell_attr.k+3;
-
-			//under lines
-			var underlines=score.underlines;
-			if(score.triplets){
-				underlines=1;
-			}
-			if(underlines && underlines>0){
-				for(let i=0;i<underlines;i++){
-					SinriScoreDrawer.drawLine(
-						canvas,
-						[cell_attr.cell_offset_x,underline_y],
-						[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
-					);
-					underline_y=underline_y+3;
-				}
-			}
-			//under points
-			var underpoints=score.underpoints;
-			if(underpoints && underpoints>0){
-				underline_y=underline_y+1;
-				for(let i=0;i<underpoints;i++){
-					SinriScoreDrawer.drawDot(
-						canvas,
-						[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
-						2
-					);
-					underline_y=underline_y+6;
-				}
-			}
-
-			//keep
-			var triplets=false;
-			if(score.triplets){
-				triplets=score.triplets;
-			}
-			if(score.keep_start && score.keep_end){
-				SinriScoreDrawer.drawArcForKeep(
-					canvas,
-					cell_attr.cell_offset_x+cell_attr.ss*0.1,
-					cell_attr.cell_offset_x+cell_attr.ss*0.9,
-					upper_y,
-					cell_attr.ss*0.9*0.2
-				);
-			}else{
-				if((SinriScoreDrawer.keep_sign_set.length-1)>=0 && !SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)].end){
-					let s_or_e='';
-					if(score.keep_start){
-						s_or_e='start';
-					}else if(score.keep_end){
-						s_or_e='end';
-					}
-					SinriScoreDrawer.keep_sign_set[(SinriScoreDrawer.keep_sign_set.length-1)][s_or_e]={
-						x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
-						y:upper_y,
-						triplets:triplets
-					};
-				}else if(score.keep_start){
-					SinriScoreDrawer.keep_sign_set.push({
-						start:{
-							x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
-							y:upper_y,
-							triplets:triplets
-						}
-					});
-				}
-			}
 		}
-	},
+
+		if(score.fermata){// /.\
+			this.drawArcForKeep(
+				cell_attr.cell_offset_x+cell_attr.ss*0.1,
+				cell_attr.cell_offset_x+cell_attr.ss*0.9,
+				upper_y-3,
+				cell_attr.ss*0.9*0.2
+			);
+			this.drawDot(
+				[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
+				2
+			);
+			upper_y=upper_y-6;
+		}
+
+		if(score.effect_word){
+			this.writeText(
+				score.effect_word,
+				[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
+				{
+					font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
+					textAlign:'left',
+					textBaseline:'middle'
+				}
+			);
+			upper_y=upper_y-6;
+		}
+
+		return upper_y;
+	}
+	this.printOneScoreCellWithObjectForUnder=function(cell_attr,score){
+		let underline_y=cell_attr.cell_offset_y+cell_attr.t+cell_attr.k+3;
+
+		//under lines
+		let underlines=(score.underlines?parseInt(score.underlines,10):0);
+		if(score.triplets){
+			underlines=1;
+		}
+		for(let i=0;underlines>0 && i<underlines;i++){
+			this.drawLine(
+				[cell_attr.cell_offset_x,underline_y],
+				[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
+			);
+			underline_y=underline_y+3;
+		}
+		//under points
+		let underpoints=(score.underpoints?parseInt(score.underpoints,10):0);
+		underline_y=underline_y+1;
+		for(let i=0;underpoints>0 && i<underpoints;i++){
+			this.drawDot(
+				[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
+				2
+			);
+			underline_y=underline_y+6;
+		}
+
+		return underline_y;
+	}
+	this.printOneScoreCellWithObjectForKeep=function(cell_attr,score,upper_y){
+		let triplets=(score.triplets?score.triplets:false);
+		let s_or_e='';
+		if(score.keep_start){
+			s_or_e='start';
+		}else if(score.keep_end){
+			s_or_e='end';
+		}
+
+		let last_sign_item=this.helper.LAST_OBJ_OF_ARRAY(this.keep_sign_set);
+
+		if(
+			last_sign_item && !last_sign_item.end
+		){
+			last_sign_item[s_or_e]={
+				x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
+				y:upper_y,
+				triplets:triplets
+			};
+			return;
+		}
+		if(score.keep_start){
+			this.keep_sign_set.push({
+				start:{
+					x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
+					y:upper_y,
+					triplets:triplets
+				}
+			});
+			return;
+		}		
+	}
 	//////
 	/**
 	 * RULE SET
@@ -457,7 +455,7 @@ var SinriScoreDrawer={
 	 * 12. For fin, use \|\|
 	 * 13. Sharp and flat
 	 */
-	parseScoreString:function(score_text){
+	this.parseScoreString=function(score_text){
 		let score_data=[];
 		let lines=score_text.split(/[\r\n]+/);
 		for(let line_index=0;line_index<lines.length;line_index++){
@@ -474,28 +472,28 @@ var SinriScoreDrawer={
 				notes=lines[line_index].slice(2).split('');
 				// alert(notes);
 			}
-			let line_data=SinriScoreDrawer.parseScoreLineString(notes,type);
+			let line_data=this.parseScoreLineString(notes,type);
 			score_data.push(line_data);
 		}
 		return score_data;
-	},
-	parseScoreLineString:function(notes,type){
+	}
+	this.parseScoreLineString=function(notes,type){
 		let line_data=[];
 		for(let note_index=0;note_index<notes.length;note_index++){
-			let note_results=SinriScoreDrawer.parseNoteString(notes[note_index],type);
-			console.log("PARSE",notes[note_index],JSON.stringify(note_results));
+			let note_results=this.parseNoteString(notes[note_index],type);
+			// console.log("PARSE",notes[note_index],JSON.stringify(note_results));
 			for(let i=0;i<note_results.length;i++){
 				line_data.push(note_results[i]);
 			}
 		}
 		return line_data;
-	},
-	parseNoteString:function(note_text,type){
+	}
+	this.parseNoteString=function(note_text,type){
 		if(type){
-			return SinriScoreDrawer.parseNoteStringWithType(note_text,type);
+			return this.parseNoteStringWithType(note_text,type);
 		}
 
-		let control_sign_note=SinriScoreDrawer.parseNoteStringForControlSign(note_text);
+		let control_sign_note=this.parseNoteStringForControlSign(note_text);
 		if(control_sign_note){
 			return control_sign_note;
 		}
@@ -517,19 +515,19 @@ var SinriScoreDrawer={
 		let flag=0;//beginning
 
 		let parts=note_text.split(':');
-		if(parts[1] && SinriScoreDrawer.NoteEffectWordDictory[parts[1]]){
-			note.effect_word=SinriScoreDrawer.NoteEffectWordDictory[parts[1]];
+		if(parts[1] && this.NoteEffectWordDictory[parts[1]]){
+			note.effect_word=this.NoteEffectWordDictory[parts[1]];
 		}
 		note_text=parts[0];
 
 		for(let i=0;i<note_text.length;i++){
 			let c=note_text[i];
-			flag=SinriScoreDrawer.parseNoteStringForNotation(c,flag,note);
+			flag=this.parseNoteStringForNotation(c,flag,note);
 		}
 
-		return SinriScoreDrawer.parseNoteStringForNotationAddition(note);
-	},
-	parseNoteStringWithType:function(note_text,type){
+		return this.parseNoteStringForNotationAddition(note);
+	}
+	this.parseNoteStringWithType=function(note_text,type){
 		if(type==='TITLE'){
 			return [{
 				special_note:'AS_IS',
@@ -548,8 +546,8 @@ var SinriScoreDrawer={
 			special_note:'AS_IS',
 			note:note_text
 		}];
-	},
-	parseNoteStringForControlSign:function(note_text){
+	}
+	this.parseNoteStringForControlSign=function(note_text){
 		let mp={
 			'||:':'REPEAT_START_DOUBLE',
 			':||':'REPEAT_END_DOUBLE',
@@ -563,8 +561,8 @@ var SinriScoreDrawer={
 		}
 
 		return false;
-	},
-	parseNoteStringForNotation:function(c,flag,note){
+	}
+	this.parseNoteStringForNotation=function(c,flag,note){
 		if(c==='(' && flag===0){
 			note.keep_start=true;
 			flag=1;//has keep_start
@@ -589,14 +587,14 @@ var SinriScoreDrawer={
 				flag=8;//\
 			}
 		}else if(c==='<' && flag===3){
-			note.underpoints=SinriScoreDrawer.INC(note.underpoints,1);
+			note.underpoints=this.helper.INC(note.underpoints,1);
 		}else if(c==='>' && flag===3){
-			note.upperpoints=SinriScoreDrawer.INC(note.upperpoints,1);
+			note.upperpoints=this.helper.INC(note.upperpoints,1);
 		}else if(c==='.' && flag===3){
 			note.dot=true;
 			flag=4;//has dot
 		}else if(c==='_' && (flag===3 || flag===5)){
-			note.underlines=SinriScoreDrawer.INC(note.underlines,1);
+			note.underlines=this.helper.INC(note.underlines,1);
 			flag=5;//has underlines
 		}else if(c==='-' && (flag===3 || flag===6)){
 			note._has_long_line+=1;
@@ -613,8 +611,8 @@ var SinriScoreDrawer={
 			flag=3;
 		}
 		return flag;
-	},
-	parseNoteStringForNotationAddition:function(note){
+	}
+	this.parseNoteStringForNotationAddition=function(note){
 		if(note._times_multiply>0){
 			note._has_long_line=note._times_multiply-1;
 		}
@@ -631,19 +629,28 @@ var SinriScoreDrawer={
 			}
 		}
 
+		let has_long_line=note._has_long_line;
+		delete note._has_long_line;
+		delete note._times_divided;
+		delete note._times_multiply;
+
 		let notes=[note];
-		for(let j=0;j<note._has_long_line;j++){
+		for(let j=0;j<has_long_line;j++){
 			notes.push({
 				special_note:'LONGER_LINE'
 			});
 		}
 
 		return notes;
-	},
-	NoteEffectWordDictory:{
+	}
+	this.NoteEffectWordDictory={
 		"F":'f',
 		"FF":'ff',
 		"P":'p',
 		"PP":'pp'
 	}
+
+
+	// initialize
+	this.canvas=this.helper.E(canvas_id);
 }
