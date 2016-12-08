@@ -541,7 +541,7 @@ function SinriScoreDrawer(canvas_id){
 		}
 
 		//ELSE
-		let regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
+		let regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.?_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
 		if(!regex.test(note_text)){
 			return [{
 				special_note:'AS_IS',
@@ -633,7 +633,7 @@ function SinriScoreDrawer(canvas_id){
 		}else if(c==='.' && flag===3){
 			note.dot=true;
 			flag=4;//has dot
-		}else if(c==='_' && (flag===3 || flag===5)){
+		}else if(c==='_' && (flag===3 || flag===4 || flag===5)){
 			note.underlines=this.helper.INC(note.underlines,1);
 			flag=5;//has underlines
 		}else if(c==='-' && (flag===3 || flag===6)){
