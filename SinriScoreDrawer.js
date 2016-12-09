@@ -30,6 +30,9 @@ function SinriScoreDrawer(canvas_id){
 			}
 			return obj+delta;
 		},
+		NUM_SCALE:function(number_in_old_scale,old_scalue,new_scale){
+			return number_in_old_scale/old_scalue*new_scale;
+		},
 		LAST_OBJ_OF_ARRAY:function(array){
 			if(!array){
 				return false;
@@ -368,7 +371,7 @@ function SinriScoreDrawer(canvas_id){
 		if(score.dot){
 			this.drawDot(
 				this.getCertainPointOfCell(cell_attr,'score_dot'),
-				2
+				this.helper.NUM_SCALE(2,30,cell_attr.ss) // 2
 			);
 		}
 	}
@@ -378,13 +381,13 @@ function SinriScoreDrawer(canvas_id){
 		//upper points
 		let upperpoints=score.upperpoints;
 		if(upperpoints && upperpoints>0){
-			upper_y=upper_y-1;
+			upper_y=upper_y-this.helper.NUM_SCALE(1,50,cell_attr.s);
 			for(let i=0;i<upperpoints;i++){
 				this.drawDot(
 					[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
-					2
+					this.helper.NUM_SCALE(2,30,cell_attr.ss) //2
 				);
-				upper_y=upper_y-6;
+				upper_y=upper_y-this.helper.NUM_SCALE(6,50,cell_attr.s);
 			}
 		}
 
@@ -392,27 +395,27 @@ function SinriScoreDrawer(canvas_id){
 			this.drawArcForKeep(
 				cell_attr.cell_offset_x+cell_attr.ss*0.1,
 				cell_attr.cell_offset_x+cell_attr.ss*0.9,
-				upper_y-3,
+				upper_y-this.helper.NUM_SCALE(3,50,cell_attr.s),
 				cell_attr.ss*0.9*0.2
 			);
 			this.drawDot(
 				[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
-				2
+				this.helper.NUM_SCALE(2,30,cell_attr.ss)
 			);
-			upper_y=upper_y-6;
+			upper_y=upper_y-this.helper.NUM_SCALE(6,50,cell_attr.s);
 		}
 
 		if(score.effect_word){
 			this.writeText(
 				score.effect_word,
-				[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-9],
+				[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-this.helper.NUM_SCALE(9,50,cell_attr.s)],
 				{
 					font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
 					textAlign:'left',
 					textBaseline:'middle'
 				}
 			);
-			upper_y=upper_y-6;
+			upper_y=upper_y-this.helper.NUM_SCALE(6,50,cell_attr.s);
 		}
 
 		return upper_y;
@@ -430,17 +433,17 @@ function SinriScoreDrawer(canvas_id){
 				[cell_attr.cell_offset_x,underline_y],
 				[cell_attr.cell_offset_x+cell_attr.ss,underline_y]
 			);
-			underline_y=underline_y+3;
+			underline_y=underline_y+this.helper.NUM_SCALE(3,50,cell_attr.s);
 		}
 		//under points
 		let underpoints=(score.underpoints?parseInt(score.underpoints,10):0);
-		underline_y=underline_y+1;
+		underline_y=underline_y+this.helper.NUM_SCALE(1,50,cell_attr.s);
 		for(let i=0;underpoints>0 && i<underpoints;i++){
 			this.drawDot(
 				[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
-				2
+				this.helper.NUM_SCALE(2,30,cell_attr.ss)
 			);
-			underline_y=underline_y+6;
+			underline_y=underline_y+this.helper.NUM_SCALE(6,50,cell_attr.s);
 		}
 
 		return underline_y;
