@@ -527,17 +527,33 @@ function SinriScoreDrawer(canvas_id){
 				has_numbered_lyric=true;
 				// alert(notes);
 			}
+			else if(first_note_char==='@'){
+				type='ALL_LYRIC';
+				notes=lines[line_index].slice(2).split('');
+				has_numbered_lyric=true;
+				// alert(notes);
+			}
 			// old
 			// let line_data=this.parseScoreLineString(notes,type);
 			// score_data.push(line_data);
 			//new 
 			the_notes_list.push({notes:notes,type:type});
 		}
+		let number=0;
 		for(let i=0;i<the_notes_list.length;i++){
 			let notes=the_notes_list[i].notes;
 			let type=the_notes_list[i].type;
-			if(has_numbered_lyric && (!type || type==='LYRIC')){
-				notes=[' '].concat(notes);
+			if(has_numbered_lyric){
+				if(!type || type==='LYRIC'){
+					notes=[' '].concat(notes);
+				}else if(type==='ALL_LYRIC'){
+					notes=['和'].concat(notes);
+				}else if(type==='NUMBERED_LYRIC'){
+					number=number+1;
+					notes=[
+					number // {note:number,special_note:'AS_IS'}
+					].concat(notes);
+				}
 			}
 			let line_data=this.parseScoreLineString(notes,type);
 			score_data.push(line_data);
@@ -546,9 +562,6 @@ function SinriScoreDrawer(canvas_id){
 	}
 	this.parseScoreLineString=function(notes,type){
 		let line_data=[];
-		if(type==='NUMBERED_LYRIC'){
-			line_data
-		}
 		for(let note_index=0;note_index<notes.length;note_index++){
 			let note_results=this.parseNoteString(notes[note_index],type);
 			// console.log("PARSE",notes[note_index],JSON.stringify(note_results));
