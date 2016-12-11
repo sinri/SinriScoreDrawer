@@ -38,7 +38,7 @@
 
 <p><a href="https://codeclimate.com/github/sinri/SinriScoreDrawer"><img src="https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/gpa.svg" alt="Code Climate"></a>
 <a href="https://codeclimate.com/github/sinri/SinriScoreDrawer"><img src="https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/issue_count.svg" alt="Issue Count"></a>
-GitHub Raw File CDN<a href="https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js">https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js</a></p>
+GitHub Raw File CDN: <a href="https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js">https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js</a></p>
 
 <h2>
 <a id="缘起" class="anchor" href="#%E7%BC%98%E8%B5%B7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>缘起</h2>
@@ -91,7 +91,7 @@ GitHub Raw File CDN<a href="https://raw.githubusercontent.com/sinri/SinriScoreDr
 
 <p>按照如下正则表达式解析。不符合此校验者将被原样输出。</p>
 
-<pre><code>^[\(]?[#bn]?([0]|([1-7](\&lt;*|\&gt;*)))[~]?((\.)|(_+)|(0)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?$
+<pre><code>^[\(]?[#bn]?([0]|([1-7](\&lt;|\&gt;)*))[~]?((\.)|(\.?_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$
 </code></pre>
 
 <h4>
@@ -108,15 +108,46 @@ GitHub Raw File CDN<a href="https://raw.githubusercontent.com/sinri/SinriScoreDr
 </code></pre>
 
 <h4>
-<a id="例子" class="anchor" href="#%E4%BE%8B%E5%AD%90" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>例子</h4>
+<a id="音符构成" class="anchor" href="#%E9%9F%B3%E7%AC%A6%E6%9E%84%E6%88%90" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>音符构成</h4>
 
-<pre><code>5- 5- | 3 5-- | 1&gt;- 1&gt;- | 6 1&gt;-- | 5- 5- | 6 5 5 3 | (2--- | 2--) 0 |
+<p>音符构成按如下顺序进行，标记从空白开始。</p>
+
+<ol>
+<li>我们使用通行的标准的4分音符作为原位音程，用<code>1</code>,<code>2</code>,<code>3</code>,<code>4</code>,<code>5</code>,<code>6</code>,<code>7</code>表示标准音高，而<code>0</code>表示休止符。现在我们得到的标记为<code>1</code>。</li>
+<li>当音高发生高八度的时候，在当前标记的右边加上<code>&gt;</code>；低八度的时候，在当前标记的右边加上<code>&lt;</code>。如<code>1&gt;</code>和<code>1&lt;</code>。</li>
+<li>当我们需要标记♯、♭、♮的时候，在当前标记的左边加上<code>#</code>、<code>b</code>、<code>n</code>。如<code>#1&gt;</code>。（倍升音符之类的罕见物品请不要强求。）</li>
+<li>当我们需要标记非四分之一音程的时候，分3类：延长线、下划线、附点和三连音。一个延长线在当前标记的右边加上<code>-</code>。一个下划线在当前标记的右边加上<code>_</code>。附点在当前标记右边加上<code>.</code>。三连音在当前标记右边加上<code>~</code>。</li>
+<li>如果本音符是连音线的起始，在当前标记左边加上<code>(</code>。如果本音符是连音线的结束，在当前标记右边加上<code>)</code>。</li>
+<li>如果有特殊标记，在当前标记右侧加上<code>:</code>以及标记代码。</li>
+</ol>
+
+<p>特殊标记代码如下</p>
+
+<pre><code>`F`: f,
+`FF`: ff,
+`P`: p,
+`PP`: pp,
+`MP`: mp,
+`MF`: mf,
+`POCO`: poco,
+`DIM`: dim...,
+`CRES`: cres...,
+`RIT`: rit...,
+`RALL`: rall...,
+`ATEMPO`: a tempo,
+`VF`: &gt;
 </code></pre>
 
 <h2>
 <a id="样本" class="anchor" href="#%E6%A0%B7%E6%9C%AC" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>样本</h2>
 
-<p>自行下载本项目并利用example.htm文件观测效果。</p>
+<pre><code>5- 5- | 3 5-- | 1&gt;- 1&gt;- | 6 1&gt;-- | 
+5- 5- | 6 5 5 3 | (2--- | 2--) 0 |
+3 3 3 2 | 2 1 1- | 5 5 5 4 | 3 4 5- |
+6 1&gt; 1&gt;. 6_ | 5 1&gt; 1&gt; 1&gt; | 3- 2- | 2 1-- ||
+</code></pre>
+
+<p>自行下载本项目并利用example.htm配合JS文件在浏览器中观测效果。</p>
         </section>
 
         <footer>
