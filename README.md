@@ -3,7 +3,7 @@ A tool to parse and draw numbered musical notation with lyrics.
 
 [![Code Climate](https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/gpa.svg)](https://codeclimate.com/github/sinri/SinriScoreDrawer)
 [![Issue Count](https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/issue_count.svg)](https://codeclimate.com/github/sinri/SinriScoreDrawer)
-GitHub Raw File CDN[https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js](https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js)
+GitHub Raw File CDN: [https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js](https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js)
 
 ## 缘起
 
@@ -45,7 +45,8 @@ GitHub Raw File CDN[https://raw.githubusercontent.com/sinri/SinriScoreDrawer/mas
 
 按照如下正则表达式解析。不符合此校验者将被原样输出。
 
-	^[\(]?[#bn]?([0]|([1-7](\<*|\>*)))[~]?((\.)|(_+)|(0)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?$
+	^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(\.?_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$
+		
 
 #### 控制符号
 
@@ -58,10 +59,39 @@ GitHub Raw File CDN[https://raw.githubusercontent.com/sinri/SinriScoreDrawer/mas
 	|
 	||
 		
-#### 例子
+#### 音符构成
 
-	5- 5- | 3 5-- | 1>- 1>- | 6 1>-- | 5- 5- | 6 5 5 3 | (2--- | 2--) 0 |
+音符构成按如下顺序进行，标记从空白开始。
+
+1. 我们使用通行的标准的4分音符作为原位音程，用`1`,`2`,`3`,`4`,`5`,`6`,`7`表示标准音高，而`0`表示休止符。现在我们得到的标记为`1`。
+2. 当音高发生高八度的时候，在当前标记的右边加上`>`；低八度的时候，在当前标记的右边加上`<`。如`1>`和`1<`。
+3. 当我们需要标记♯、♭、♮的时候，在当前标记的左边加上`#`、`b`、`n`。如`#1>`。（倍升音符之类的罕见物品请不要强求。）
+4. 当我们需要标记非四分之一音程的时候，分3类：延长线、下划线、附点和三连音。一个延长线在当前标记的右边加上`-`。一个下划线在当前标记的右边加上`_`。附点在当前标记右边加上`.`。三连音在当前标记右边加上`~`。
+5. 如果本音符是连音线的起始，在当前标记左边加上`(`。如果本音符是连音线的结束，在当前标记右边加上`)`。
+6. 如果有特殊标记，在当前标记右侧加上`:`以及标记代码。
+
+特殊标记代码如下
+
+	`F`: f,
+	`FF`: ff,
+	`P`: p,
+	`PP`: pp,
+	`MP`: mp,
+	`MF`: mf,
+	`POCO`: poco,
+	`DIM`: dim...,
+	`CRES`: cres...,
+	`RIT`: rit...,
+	`RALL`: rall...,
+	`ATEMPO`: a tempo,
+	`VF`: >
 
 ## 样本
 
-自行下载本项目并利用example.htm文件观测效果。
+	5- 5- | 3 5-- | 1>- 1>- | 6 1>-- | 
+	5- 5- | 6 5 5 3 | (2--- | 2--) 0 |
+	3 3 3 2 | 2 1 1- | 5 5 5 4 | 3 4 5- |
+	6 1> 1>. 6_ | 5 1> 1> 1> | 3- 2- | 2 1-- ||
+
+自行下载本项目并利用example.htm配合JS文件在浏览器中观测效果。
+

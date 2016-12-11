@@ -689,7 +689,16 @@ function SinriScoreDrawer(canvas_id){
 		"F":'f',
 		"FF":'ff',
 		"P":'p',
-		"PP":'pp'
+		"PP":'pp',
+		"MP":"mp",
+		"MF":"mf",
+		"POCO":"poco",
+		"DIM":"dim...",
+		"CRES":"cres...",
+		"RIT":"rit...",
+		"RALL":"rall...",
+		"ATEMPO":"a tempo",
+		"VF":">"
 	}
 
 
