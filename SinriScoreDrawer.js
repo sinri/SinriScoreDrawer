@@ -222,7 +222,7 @@ function SinriScoreDrawer(canvas_id){
 					this.drawArcForKeep(
 						keep_info.start.x,
 						keep_info.end.x,
-						Math.max(keep_info.start.y,keep_info.end.y),
+						Math.min(keep_info.start.y,keep_info.end.y),
 						(keep_info.end.x-keep_info.start.x)*0.2,//0.2 as ori
 						(keep_info.start.triplets?true:false)
 					);
