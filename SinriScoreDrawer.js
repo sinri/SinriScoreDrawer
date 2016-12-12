@@ -684,7 +684,7 @@ function SinriScoreDrawer(canvas_id){
 			flag=7;
 		}else if(c==='\/' && (flag===3 || flag===8)){
 			flag=8;
-		}else if(c===')' && flag>3){
+		}else if(c===')' && flag>=3){
 			note.keep_end=true;
 			flag=9;
 		}else if(c==='~' && flag===3){
