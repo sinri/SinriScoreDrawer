@@ -8,10 +8,11 @@
 		
 		function parse_and_draw_score_text(){
 			var SSD=new SinriScoreDrawer('myCanvas');
+			SSD.varAutoCellWidth=true;
 			var textarea=SSD.helper.E('ta');
 			var the_score_data=SSD.parseScoreString(textarea.value);
 			SSD.helper.E('parsed_json').value=JSON.stringify(the_score_data,null,2);
-			SSD.loadScoreData(the_score_data,{width:30,height:50});
+			SSD.loadScoreData(the_score_data,{width:30*2,height:50*2});
 		}
 		function getImageDataUrl(){
 			SinriScoreDrawer().helper.E('parsed_json').value=SinriScoreDrawer().helper.PARSE_TO_DATA_URL(SinriScoreDrawer().helper.E('ta').value);
@@ -51,6 +52,7 @@
 			float: left;
 			/*border:1px solid #000000;*/
 			border: none;
+			width: 65%;
 		}
 	</style>
 </head>
@@ -60,8 +62,8 @@
 		<button id="btn_p" onclick='parse_and_draw_score_text()'>Parse and Draw Score Text</button>
 		<button id="btn_s" onclick="getImageDataUrl()">Get image DataUrl</button>
 	</div>
-	<div id="edit_pane">		
-		<textarea id="ta">~ 1=D 4/4　　　　　　选本129首　　　　　　父的启示
+	<!--
+~ 1=D 4/4　　　　　　选本129首　　　　　　父的启示
 3 3 4 5 | 5 4~ 3 2 | 1 1 2 3 | 3. 2_ 2- |
 > 阿爸父啊，我们现在 因主到你 面前来；
 3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2. 1_ 1- |
@@ -72,12 +74,34 @@
 > 你灵也已 指教我们，呼喊阿爸 近你身。
 (2---:P | 1--) 0 ||
 > 阿    门
-</textarea>
+	-->
+	<div id="edit_pane">
+		<textarea id="ta">~ 1=C　4/4　　　　　　选本第12首　　　　　　难测的爱
+3 3._ 2__ 1 1 | 4 4 3- | 3 2._ 1__ 5 3 | 2-- 0 |
+> 恩何奇妙爱 何深广， 神差爱子来 此；
+3 3._ 2__ 1 1 | 6 6 5- | 1 1._ 2__ 3 2 | 1-- 0 |
+> 罪的审判归 祂身上， 为你为我代 死。
+2 2._ 3__ 4 6 | 5. 4_ 3- | 2 2._ 3__ 4 6 | 5. 4_ 3- |
+> 恩门爱路今 正齐开， 无别拯救除 祂以外，
+1> 1>._ 1>__ 7 7 | 6 6 5- | 1 1._ 2__ 3 2 | 1-- 0 ||
+> 神心依依等 待你来， 切莫拒祂奇 爱。
+
+~ 1=F 6/8 　　　　　　　　　　　　　　第十三首 　　　　　　　　　　　　　 难测的爱
+1. | (3_ 2_) 1_ (5<_ 7<_) 2_ | 1. 5. | (5_ 3_) 1_ 2 3_ | 2. |
+# 神 差 爱子 舍 命代 替 我们受 刑
+5. | (5_ 3_) 3_ (3_ 2_) 1_ | 1 1_ (1_ 6<_) 5<_ | (3_ 2_) 1_ (5<_ 7<_) 2_ | 1~. |
+> 神 的 奇爱 从 此显明 世 上 罪人 何 幸
+1. | (3_ 2_) 1_ (5<_ 7<_) 2_ | 1. 5. | (5_ 3_) 1_ 2 3_ | 2. |
+@ 朋 友 神正 爱 你今 天 祂等待 你
+5. | (5_ 3_) 3_ (3_ 2_) 1_ | 1 1_ (1_ 6<_) 5<_ | (3_ 2_) 1_ (5<_ 7<_) 2_ | 1~. ||
+> 虽 遭 拒绝 仍 不放弃 不 可 负祂 美 意
+# 神愿万人得救，不愿一人沉沦；
+> 罪中灭亡，痛苦永久，趁早接受主恩！
+		</textarea>
 	</div>
 	<div id="display_pane">
 		<textarea id="parsed_json" readonly="readonly"></textarea>
-		<canvas id="myCanvas" width="600" height="600" style="">
-		</canvas>
+		<canvas id="myCanvas" style=""></canvas>
 	</div>
 </body>
 </html>

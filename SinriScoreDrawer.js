@@ -66,6 +66,11 @@ function SinriScoreDrawer(canvas_id){
 			window.URL.revokeObjectURL(url);
 		}
 	}
+
+	this.varAutoCellWidth=false;
+	this.autoCellWidth=function(){
+		return this.varAutoCellWidth;
+	}
 	
 	// Canvas
 	this.toDataUrl=function(){
@@ -158,6 +163,18 @@ function SinriScoreDrawer(canvas_id){
 	 * @param score_data as array
 	 */
 	this.loadScoreData=function(score_data,cell_size,no_auto_canvas_size){
+		//check
+		let has_numbered_lyric=false;
+		for(let checker=0;checker<score_data.length;checker++){
+			if(score_data[checker].title){
+				continue;
+			}
+			if(score_data[checker][0].indentation){
+				has_numbered_lyric=true;
+				break;
+			}
+		}
+
 		let score_size=this.getScoreSize(score_data);
 
 		let s=40,ss=40,k=24,kk=24;
@@ -199,21 +216,55 @@ function SinriScoreDrawer(canvas_id){
 		for(let y=0;y<score_size.h-2;y++){
 			let score_line=score_data[y];
 			this.keep_sign_set=[];
+
+			/* new idea */
+			let real_cell_in_this_row=score_line.length;
+			// let real_s=s;
+			let real_ss=ss;
+			// let real_k=k;
+			let real_kk=kk;
+
+			// if(this.autoCellWidth() && real_cell_in_this_row>0){
+			// 	// really diffs
+			// 	real_ss=(this.canvas.width-entire_offset.x*2-3*ss)/(real_cell_in_this_row-1);
+			// 	real_kk=parseInt(Math.floor(real_ss*0.6),10);
+			// }
+
 			for(let x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
+					// if(x===0 && score_line[x].indentation){
+						real_ss=ss;
+						real_kk=kk;
+					// }
+					console.log(
+						"miao",
+						this.autoCellWidth(),
+						real_cell_in_this_row>0,
+						x>0,
+						has_numbered_lyric
+					);
+					if(this.autoCellWidth() && real_cell_in_this_row>0 && x>0 && has_numbered_lyric){
+						real_ss=(this.canvas.width-entire_offset.x*2-3*ss)/(real_cell_in_this_row-1);
+						real_kk=parseInt(Math.floor(real_ss*0.6),10);
+					}
 					// let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
 					// let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
 					this.printOneScoreCell({
 						s:s,//cell's total height
 						k:k,//char area height
-						ss:ss,//cell's total width
-						kk:kk,//char area width
-						cell_offset_x:(entire_offset.x+ss*x+ss),
+						ss:real_ss,//cell's total width
+						kk:real_kk,//char area width
+						min_ss:ss,
+						min_kk:kk,
+						cell_offset_x:(entire_offset.x+real_ss*x+ss),
 						cell_offset_y:(s*y+s),
 						score_size:score_size,
 						t:parseInt(Math.floor((s-k)/2.0),10),
-						tt:parseInt(Math.floor((ss-kk)/2.0),10)
-					},score_line[x]);
+						tt:parseInt(Math.floor((real_ss-real_kk)/2.0),10)
+					},
+					score_line[x],
+					false // true //debug cell
+					);
 				}
 			}
 			for(let keep_index=0;keep_index<this.keep_sign_set.length;keep_index++){
@@ -341,7 +392,7 @@ function SinriScoreDrawer(canvas_id){
 			note_text,
 			this.getCertainPointOfCell(cell_attr,'center_of_cell'),
 			{
-				font:''+(Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+				font:''+(Math.min(cell_attr.k,cell_attr.min_kk))+'px sans-serif',
 				textAlign:(score.title?'left':'center'),
 				textBaseline:'middle'
 			}
@@ -361,7 +412,7 @@ function SinriScoreDrawer(canvas_id){
 				sfn_char,
 				this.getCertainPointOfCell(cell_attr,'SFN'),
 				{
-					font:''+(0.8*Math.min(cell_attr.k,cell_attr.kk))+'px sans-serif',
+					font:''+(0.8*Math.min(cell_attr.k,cell_attr.min_kk))+'px sans-serif',
 					textAlign:'center',
 					textBaseline:'middle'
 				}
@@ -410,7 +461,7 @@ function SinriScoreDrawer(canvas_id){
 				score.effect_word,
 				[cell_attr.cell_offset_x+cell_attr.ss*0.1,upper_y-this.helper.NUM_SCALE(9,50,cell_attr.s)],
 				{
-					font:'italic '+(Math.min(cell_attr.k,cell_attr.kk)*0.6)+'px sans-serif',
+					font:'italic '+(Math.min(cell_attr.k,cell_attr.min_kk)*0.6)+'px sans-serif',
 					textAlign:'left',
 					textBaseline:'middle'
 				}
@@ -540,6 +591,7 @@ function SinriScoreDrawer(canvas_id){
 			the_notes_list.push({notes:notes,type:type});
 		}
 		let number=0;
+		let prev_score_line_cells=0;
 		for(let i=0;i<the_notes_list.length;i++){
 			let notes=the_notes_list[i].notes;
 			let type=the_notes_list[i].type;
@@ -550,12 +602,33 @@ function SinriScoreDrawer(canvas_id){
 					notes=['和'].concat(notes);
 				}else if(type==='NUMBERED_LYRIC'){
 					number=number+1;
-					notes=[
-					number // {note:number,special_note:'AS_IS'}
-					].concat(notes);
+					notes=[number].concat(notes);
 				}
 			}
 			let line_data=this.parseScoreLineString(notes,type);
+			
+			/* new idea: set indentation and fill final empty */
+			if(has_numbered_lyric && type==='ALL_LYRIC' || type==='NUMBERED_LYRIC'){
+				if(line_data[0]){
+					line_data[0].indentation=true;
+				}
+			}
+			if(this.autoCellWidth()){
+				if(!type){
+					prev_score_line_cells=line_data.length;
+				}else if(type==='LYRIC'){
+					let tarinai=prev_score_line_cells-line_data.length;
+					for(let fill_count=0;fill_count<tarinai;fill_count++){
+						line_data.push({note:' '});
+					}
+				}else if(type==='ALL_LYRIC' || type==='NUMBERED_LYRIC'){
+					let tarinai=prev_score_line_cells+0-line_data.length;
+					for(let fill_count=0;fill_count<tarinai;fill_count++){
+						line_data.push({note:' ',indentation:true});
+					}
+				}
+			}
+
 			score_data.push(line_data);
 		}
 		return score_data;
