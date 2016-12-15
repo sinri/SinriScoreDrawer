@@ -64,6 +64,33 @@ function SinriScoreDrawer(canvas_id){
 			a.download = filename;
 			a.click();
 			window.URL.revokeObjectURL(url);
+		},
+		MERGE_SEIGE:function(array,seige_item){
+			// console.log('MERGE_SEIGE...');
+			// console.log(array);
+			let after=[];
+			let inside=null;//  null ('' 'X' )null 
+			for(let i=0;i<array.length;i++){
+				if(array[i]===seige_item){
+					if(inside===null){
+						inside='';
+					}else{
+						after.push(inside);
+						inside=null;
+					}
+				}else{
+					if(inside!==null){
+						inside+=array[i];
+					}else{
+						after.push(array[i]);
+					}
+				}
+			}
+			if(inside!==null){
+				after.push(inside);
+			}
+			// console.log(after);
+			return after;
 		}
 	}
 
@@ -236,13 +263,13 @@ function SinriScoreDrawer(canvas_id){
 						real_ss=ss;
 						real_kk=kk;
 					// }
-					console.log(
-						"miao",
-						this.autoCellWidth(),
-						real_cell_in_this_row>0,
-						x>0,
-						has_numbered_lyric
-					);
+					// console.log(
+					// 	"miao",
+					// 	this.autoCellWidth(),
+					// 	real_cell_in_this_row>0,
+					// 	x>0,
+					// 	has_numbered_lyric
+					// );
 					if(this.autoCellWidth() && real_cell_in_this_row>0 && x>0 && has_numbered_lyric){
 						real_ss=(this.canvas.width-entire_offset.x*2-3*ss)/(real_cell_in_this_row-1);
 						real_kk=parseInt(Math.floor(real_ss*0.6),10);
@@ -570,19 +597,19 @@ function SinriScoreDrawer(canvas_id){
 			else if(first_note_char==='>'){
 				type='LYRIC';
 				notes=lines[line_index].slice(2).split('');
-				// alert(notes);
+				notes=this.helper.MERGE_SEIGE(notes,'`');
 			}
 			else if(first_note_char==='#'){
 				type='NUMBERED_LYRIC';
 				notes=lines[line_index].slice(2).split('');
 				has_numbered_lyric=true;
-				// alert(notes);
+				notes=this.helper.MERGE_SEIGE(notes,'`');
 			}
 			else if(first_note_char==='@'){
 				type='ALL_LYRIC';
 				notes=lines[line_index].slice(2).split('');
 				has_numbered_lyric=true;
-				// alert(notes);
+				notes=this.helper.MERGE_SEIGE(notes,'`');
 			}
 			// old
 			// let line_data=this.parseScoreLineString(notes,type);
