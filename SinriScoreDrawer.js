@@ -588,10 +588,10 @@ function SinriScoreDrawer(canvas_id){
 			let notes=lines[line_index].trim().split(/[ ]+/);
 			
 			let type=null;
-			let first_note_char=notes[0];
+			let first_note_char=lines[line_index].substr(0,1);//notes[0];
 			if(first_note_char==='~'){
 				type='TITLE';
-				let title=(notes.shift() ? notes.join(' ') : lines[line_index]);
+				let title=lines[line_index].substr(2);
 				notes=[title];
 			}
 			else if(first_note_char==='>'){
