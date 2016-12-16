@@ -415,12 +415,18 @@ function SinriScoreDrawer(canvas_id){
 				note_text=mp[score.special_note];
 			}
 		}
+		let text_point=this.getCertainPointOfCell(cell_attr,'center_of_cell');
+		if(score.title){
+			//text_point as cancvs center
+			text_point=[this.canvas.width/2,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5];
+			//ctx.measureText("foo").width 要不要考虑后面自动调整字体大小，现在还是算了
+		}
 		this.writeText(
 			note_text,
-			this.getCertainPointOfCell(cell_attr,'center_of_cell'),
+			text_point,
 			{
 				font:''+(Math.min(cell_attr.k,cell_attr.min_kk))+'px sans-serif',
-				textAlign:(score.title?'left':'center'),
+				textAlign:'center',//(score.title?'left':'center'),
 				textBaseline:'middle'
 			}
 		);
