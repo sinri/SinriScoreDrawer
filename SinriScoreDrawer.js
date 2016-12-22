@@ -301,7 +301,7 @@ function SinriScoreDrawer(canvas_id){
 						keep_info.start.x,
 						keep_info.end.x,
 						Math.min(keep_info.start.y,keep_info.end.y),
-						(keep_info.end.x-keep_info.start.x)*0.2,//0.2 as ori
+						Math.min((keep_info.end.x-keep_info.start.x)*0.2,(k-kk)/2.0),//0.2 as ori
 						(keep_info.start.triplets?true:false)
 					);
 				}
@@ -534,24 +534,16 @@ function SinriScoreDrawer(canvas_id){
 	}
 	this.printOneScoreCellWithObjectForKeep=function(cell_attr,score,upper_y){
 		let triplets=(score.triplets?score.triplets:false);
-		let s_or_e='';
-		if(score.keep_start){
-			s_or_e='start';
-		}else if(score.keep_end){
-			s_or_e='end';
-		}
-
 		let last_sign_item=this.helper.LAST_OBJ_OF_ARRAY(this.keep_sign_set);
-
-		if(
-			last_sign_item && !last_sign_item.end
-		){
-			last_sign_item[s_or_e]={
-				x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
-				y:upper_y,
-				triplets:triplets
-			};
-			return;
+		
+		if(score.keep_end){
+			if(last_sign_item && !last_sign_item.end){
+				last_sign_item['end']={
+					x:cell_attr.cell_offset_x+cell_attr.ss*0.5,
+					y:upper_y,
+					triplets:triplets
+				};
+			}
 		}
 		if(score.keep_start){
 			this.keep_sign_set.push({
@@ -561,8 +553,8 @@ function SinriScoreDrawer(canvas_id){
 					triplets:triplets
 				}
 			});
-			return;
-		}		
+		}
+
 	}
 	//////
 	/**
@@ -688,12 +680,12 @@ function SinriScoreDrawer(canvas_id){
 		}
 
 		//ELSE
-		let regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?((\.)|(\.?_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
+		let regex=/^[\(]?[#bn]?([0]|([1-7](\<|\>)*))[~]?(([\._]+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$/;
 		if(!regex.test(note_text)){
 			return [{
 				special_note:'AS_IS',
 				note:note_text
-			}]
+			}];
 		}
 
 		let note={
