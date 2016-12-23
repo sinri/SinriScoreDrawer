@@ -624,7 +624,7 @@ function SinriScoreDrawer(canvas_id){
 			let line_data=this.parseScoreLineString(notes,type);
 			
 			/* new idea: set indentation and fill final empty */
-			if(has_numbered_lyric && type==='ALL_LYRIC' || type==='NUMBERED_LYRIC'){
+			if(has_numbered_lyric && (type==='ALL_LYRIC' || type==='NUMBERED_LYRIC')){
 				if(line_data[0]){
 					line_data[0].indentation=true;
 				}
