@@ -11,11 +11,11 @@
 */
 
 if (!('remove' in Element.prototype)) {
-    Element.prototype.remove = function() {
-        if (this.parentNode) {
-            this.parentNode.removeChild(this);
-        }
-    };	
+	Element.prototype.remove = function() {
+		if (this.parentNode) {
+			this.parentNode.removeChild(this);
+		}
+	};  
 }
 
 function SinriScoreDrawer(canvas_id){
@@ -66,8 +66,6 @@ function SinriScoreDrawer(canvas_id){
 			window.URL.revokeObjectURL(url);
 		},
 		MERGE_SEIGE:function(array,seige_item){
-			// console.log('MERGE_SEIGE...');
-			// console.log(array);
 			let after=[];
 			let inside=null;//  null ('' 'X' )null 
 			for(let i=0;i<array.length;i++){
@@ -89,12 +87,11 @@ function SinriScoreDrawer(canvas_id){
 			if(inside!==null){
 				after.push(inside);
 			}
-			// console.log(after);
 			return after;
 		}
 	}
 
-	this.varAutoCellWidth=false;
+	this.varAutoCellWidth=true;
 	this.autoCellWidth=function(){
 		return this.varAutoCellWidth;
 	}
@@ -183,7 +180,7 @@ function SinriScoreDrawer(canvas_id){
 			return;
 		}
 
-		ctx.fillText(text,point_base[0],point_base[1]);		
+		ctx.fillText(text,point_base[0],point_base[1]);     
 	}
 	// 按照编译完的对象制图
 	/**
@@ -252,30 +249,19 @@ function SinriScoreDrawer(canvas_id){
 			let real_kk=kk;
 
 			// if(this.autoCellWidth() && real_cell_in_this_row>0){
-			// 	// really diffs
-			// 	real_ss=(this.canvas.width-entire_offset.x*2-3*ss)/(real_cell_in_this_row-1);
-			// 	real_kk=parseInt(Math.floor(real_ss*0.6),10);
+			//  // really diffs
+			//  real_ss=(this.canvas.width-entire_offset.x*2-3*ss)/(real_cell_in_this_row-1);
+			//  real_kk=parseInt(Math.floor(real_ss*0.6),10);
 			// }
 
 			for(let x=0;x<score_size.w-2;x++){
 				if(score_line[x]){
-					// if(x===0 && score_line[x].indentation){
-						real_ss=ss;
-						real_kk=kk;
-					// }
-					// console.log(
-					// 	"miao",
-					// 	this.autoCellWidth(),
-					// 	real_cell_in_this_row>0,
-					// 	x>0,
-					// 	has_numbered_lyric
-					// );
+					real_ss=ss;
+					real_kk=kk;
 					if(this.autoCellWidth() && real_cell_in_this_row>0 && x>0 && has_numbered_lyric){
 						real_ss=(this.canvas.width-entire_offset.x*2-3*ss)/(real_cell_in_this_row-1);
 						real_kk=parseInt(Math.floor(real_ss*0.6),10);
 					}
-					// let t=parseInt(Math.floor((s-k)/2.0),10);//char outside space height
-					// let tt=parseInt(Math.floor((ss-kk)/2.0),10);//char outside space width
 					this.printOneScoreCell({
 						s:s,//cell's total height
 						k:k,//char area height
@@ -357,7 +343,7 @@ function SinriScoreDrawer(canvas_id){
 	this.printOneScoreCell=function(cell_attr,score,show_cell_border){
 		if(show_cell_border){
 			this.debugDrawCellBorder(cell_attr);
-		}	
+		}   
 		this.setStrokeStyle("black");
 		this.setFillStyle("black");
 
@@ -421,11 +407,16 @@ function SinriScoreDrawer(canvas_id){
 			text_point=[this.canvas.width/2,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5];
 			//ctx.measureText("foo").width 要不要考虑后面自动调整字体大小，现在还是算了
 		}
+		let font_setting='sans-serif';
+		if(score.indentation){
+			//line head 1,2,3... or All Sing
+			font_setting='serif';
+		}
 		this.writeText(
 			note_text,
 			text_point,
 			{
-				font:''+(Math.min(cell_attr.k,cell_attr.min_kk))+'px sans-serif',
+				font:''+(Math.min(cell_attr.k,cell_attr.min_kk))+'px '+font_setting,
 				textAlign:'center',//(score.title?'left':'center'),
 				textBaseline:'middle'
 			}
@@ -662,7 +653,6 @@ function SinriScoreDrawer(canvas_id){
 		let line_data=[];
 		for(let note_index=0;note_index<notes.length;note_index++){
 			let note_results=this.parseNoteString(notes[note_index],type);
-			// console.log("PARSE",notes[note_index],JSON.stringify(note_results));
 			for(let i=0;i<note_results.length;i++){
 				line_data.push(note_results[i]);
 			}
