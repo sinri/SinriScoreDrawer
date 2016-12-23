@@ -769,7 +769,7 @@ function SinriScoreDrawer(canvas_id){
 			note.underpoints=this.helper.INC(note.underpoints,1);
 		}else if(c==='>' && flag===3){
 			note.upperpoints=this.helper.INC(note.upperpoints,1);
-		}else if(c==='.' && flag===3){
+		}else if(c==='.' && (flag===3 || flag===4 || flag===5)){
 			note.dot=true;
 			flag=4;//has dot
 		}else if(c==='_' && (flag===3 || flag===4 || flag===5)){
