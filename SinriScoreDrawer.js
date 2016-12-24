@@ -402,12 +402,13 @@ function SinriScoreDrawer(canvas_id){
 			}
 		}
 		let text_point=this.getCertainPointOfCell(cell_attr,'center_of_cell');
+		let font_setting='sans-serif';
 		if(score.title){
 			//text_point as cancvs center
 			text_point=[this.canvas.width/2,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5];
 			//ctx.measureText("foo").width 要不要考虑后面自动调整字体大小，现在还是算了
-		}
-		let font_setting='sans-serif';
+			font_setting='serif';
+		}		
 		if(score.indentation){
 			//line head 1,2,3... or All Sing
 			font_setting='serif';
