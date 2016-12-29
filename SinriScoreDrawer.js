@@ -393,7 +393,8 @@ function SinriScoreDrawer(canvas_id){
 				'REPEAT_END_SINGLE':":|",
 				'LONGER_LINE':"ー",
 				'FIN':"‖",
-				'PHARSE_FIN':"|"
+				'PHARSE_FIN':"|",
+				'DOT':'・'
 			}
 			if(score.special_note==='AS_IS' && score.note){
 				note_text=score.note;
@@ -407,11 +408,11 @@ function SinriScoreDrawer(canvas_id){
 			//text_point as cancvs center
 			text_point=[this.canvas.width/2,cell_attr.cell_offset_y+cell_attr.t+cell_attr.k*0.5];
 			//ctx.measureText("foo").width 要不要考虑后面自动调整字体大小，现在还是算了
-			font_setting='serif';
+			font_setting='serif';//for ios, Palatino
 		}		
 		if(score.indentation){
 			//line head 1,2,3... or All Sing
-			font_setting='serif';
+			font_setting='serif';//for ios, Palatino
 		}
 		this.writeText(
 			note_text,
@@ -804,6 +805,12 @@ function SinriScoreDrawer(canvas_id){
 		delete note._times_multiply;
 
 		let notes=[note];
+		if(note.dot){
+			notes.push({
+				special_note:'DOT'
+			});
+			note.dot=false;
+		}
 		for(let j=0;j<has_long_line;j++){
 			notes.push({
 				special_note:'LONGER_LINE'
