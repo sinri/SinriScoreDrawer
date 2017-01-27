@@ -141,6 +141,7 @@ function SinriScoreDrawer(canvas_id){
 		ctx.stroke();
 	}
 	this.drawDot=function(point_center,radius){
+		// radius=Math.min(3,radius);
 		this.drawCircle(point_center,radius,'fill');
 	}
 	this.drawArcForKeep=function(point_start_x,point_end_x,point_y,omega,triplets){
@@ -448,7 +449,7 @@ function SinriScoreDrawer(canvas_id){
 		if(score.dot){
 			this.drawDot(
 				this.getCertainPointOfCell(cell_attr,'score_dot'),
-				this.helper.NUM_SCALE(2,30,cell_attr.ss) // 2
+				this.helper.NUM_SCALE(2,50,cell_attr.s) // 2
 			);
 		}
 	}
@@ -462,7 +463,7 @@ function SinriScoreDrawer(canvas_id){
 			for(let i=0;i<upperpoints;i++){
 				this.drawDot(
 					[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
-					this.helper.NUM_SCALE(2,30,cell_attr.ss) //2
+					this.helper.NUM_SCALE(2,50,cell_attr.s) //2
 				);
 				upper_y=upper_y-this.helper.NUM_SCALE(6,50,cell_attr.s);
 			}
@@ -477,7 +478,7 @@ function SinriScoreDrawer(canvas_id){
 			);
 			this.drawDot(
 				[cell_attr.cell_offset_x+cell_attr.ss/2,upper_y],
-				this.helper.NUM_SCALE(2,30,cell_attr.ss)
+				this.helper.NUM_SCALE(2,50,cell_attr.s)
 			);
 			upper_y=upper_y-this.helper.NUM_SCALE(6,50,cell_attr.s);
 		}
@@ -518,7 +519,7 @@ function SinriScoreDrawer(canvas_id){
 		for(let i=0;underpoints>0 && i<underpoints;i++){
 			this.drawDot(
 				[cell_attr.cell_offset_x+cell_attr.ss/2,underline_y],
-				this.helper.NUM_SCALE(2,30,cell_attr.ss)
+				this.helper.NUM_SCALE(2,50,cell_attr.s)
 			);
 			underline_y=underline_y+this.helper.NUM_SCALE(6,50,cell_attr.s);
 		}
