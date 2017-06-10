@@ -97,3 +97,6 @@ GitHub Raw File CDN: [https://raw.githubusercontent.com/sinri/SinriScoreDrawer/m
 
 自行下载本项目并利用example.htm配合JS文件在浏览器中观测效果。
 
+# 许可
+
+本项目以GPLv3发布对外许可。作者自身及特别声明的相关实体之版权范围内其他项目引用此项目不在此限。
