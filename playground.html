@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SinriScoreDrawer Example</title>
+  <script src="./javascripts/SinriScoreDrawer.js"></script>
+  <script type="text/javascript">
+
+    function parse_and_draw_score_text(){
+      var SSD=new SinriScoreDrawer('myCanvas');
+      SSD.varAutoCellWidth=true;
+      var textarea=SSD.helper.E('ta');
+      var the_score_data=SSD.parseScoreString(textarea.value);
+      SSD.helper.E('parsed_json').value=JSON.stringify(the_score_data,null,2);
+      SSD.loadScoreData(the_score_data,{width:30*2,height:50*2});
+    }
+    function getImageDataUrl(){
+      SinriScoreDrawer().helper.E('parsed_json').value=SinriScoreDrawer().helper.PARSE_TO_DATA_URL(SinriScoreDrawer().helper.E('ta').value);
+      // window.location.href=SinriScoreDrawer().helper.E('parsed_json').value;
+      SinriScoreDrawer().helper.DOWNLOAD_URL(SinriScoreDrawer().helper.E('parsed_json').value);
+    }
+  </script>
+  <style type="text/css">
+    div {
+      margin: 5px;
+    }
+    #ta {
+      width: 90%;
+      height: 100px;
+    }
+    #btn_p{
+      padding: 5px;
+      background: #039aff;
+      color: white;
+      border: none;
+    }
+    #btn_s{
+      padding: 5px;
+      background: #230a3f;
+      color: white;
+      border: none;
+    }
+    #parsed_json {
+      display: block;
+      float: left;
+      width: 25%;
+      height: 500px;
+      margin-right: 10px;
+    }
+    #myCanvas {
+      display: block;
+      float: left;
+      /*border:1px solid #000000;*/
+      border: none;
+      width: 65%;
+    }
+  </style>
+</head>
+<body>
+<div id="header">
+  <a href="https://github.com/sinri/SinriScoreDrawer">SinriScoreDrawer</a> Example ↓ Write score below and click button to see result.
+  <button id="btn_p" onclick='parse_and_draw_score_text()'>Parse and Draw Score Text</button>
+  <button id="btn_s" onclick="getImageDataUrl()">Get image DataUrl</button>
+</div>
+<!--
+~ 1=D 4/4　　　　　　选本129首　　　　　　父的启示
+3 3 4 5 | 5 4~ 3 2 | 1 1 2 3 | 3. 2_ 2- |
+> 阿爸父啊，我们现在 因主到你 面前来；
+3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2. 1_ 1- |
+> 你的儿女 到此聚集，愿得应许 的福气。
+2 2 3 1 | 2 (3_ 4_) 3 1 | 2 (3_ 4_) 3 2 | 1 2 5<- |
+> 祂的宝血 已洗 我们，我们 藉祂 来得恩，
+3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2. 1_ 1- |
+> 你灵也已 指教我们，呼喊阿爸 近你身。
+(2---:P | 1--) 0 ||
+> 阿    门
+-->
+<div id="edit_pane">
+		<textarea id="ta">~ 1=A 4/4                                      第一百零六首                                           主的复活
+5-:MP 5 6 | 6 5 5- | 5- 4 6 | 6- 5- |
+# 祂 躺卧 在坟墓  耶 稣我 救 主
+6- 7 1> | 1> 5 5- | 6- 5 #4 | 5--- |
+> 静 待晨 光重曙  耶 稣我 主
+1 1_.:F 1__ 3 5_. 5__ | 1>-- 1>_. 2>__ | 3> 1> 2>._ 1>__ 7_. 6__ | 5-- |
+@ 祂从 坟墓已 起 来  胜 过 仇敌大 大的 奏 凯
+7_. 1>__ | 2> 2> 2>_. 1>__ 2>_. 3>__ | 1> 6 5 |
+> 祂 从 黑域起 来祂 是 得胜者
+ 5_. 5__ | 6 6 6_. 2>__ 2>_. 1>__ | 7:RIT 1> 2> 5_. 5__ | 3>-- |
+> 活 着 掌权同 祂众 圣 徒联合祂 起 来
+2>_. 1>__ | 4>-- | 3>_. 2>__ | 1> 5 3>:RIT 2> | 1>--- ||
+> 祂 起 来   阿 利 路亚主起 来
+# 兵丁徒然看守，耶稣我救主！
+> 石头徒然封口，耶稣我主！
+# 死亡无法锁关，耶稣我救主！
+> 祂已打断栅栏，耶稣我主！
+		</textarea>
+</div>
+<div id="display_pane">
+  <textarea id="parsed_json" readonly="readonly"></textarea>
+  <canvas id="myCanvas" style=""></canvas>
+</div>
+</body>
+</html>

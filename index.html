@@ -16,114 +16,100 @@
   <body>
     <div id="container">
       <div class="inner">
-
         <header>
           <h1>SinriScoreDrawer</h1>
           <h2>A tool to parse and draw numbered musical notation.</h2>
         </header>
-
         <section id="downloads" class="clearfix">
           <a href="https://github.com/sinri/SinriScoreDrawer/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
           <a href="https://github.com/sinri/SinriScoreDrawer/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
           <a href="https://github.com/sinri/SinriScoreDrawer" id="view-on-github" class="button"><span>View on GitHub</span></a>
         </section>
-
         <hr>
-
         <section id="main_content">
           <h1>
-<a id="sinriscoredrawer" class="anchor" href="#sinriscoredrawer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SinriScoreDrawer</h1>
-
-<p>A tool to parse and draw numbered musical notation with lyrics.</p>
-
-<p><a href="https://codeclimate.com/github/sinri/SinriScoreDrawer"><img src="https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/gpa.svg" alt="Code Climate"></a>
-<a href="https://codeclimate.com/github/sinri/SinriScoreDrawer"><img src="https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/issue_count.svg" alt="Issue Count"></a>
-GitHub Raw File CDN: <a href="https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js">https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js</a></p>
-
-<h2>
-<a id="缘起" class="anchor" href="#%E7%BC%98%E8%B5%B7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>缘起</h2>
-
-<p>“小群的诗歌本”需要存储圣诗歌谱，之前开发的<a href="https://github.com/sinri/Monochrome">Monochrome</a>图片有损压缩起了相当的作用。然而因为圣诗太多，整体应用的存储占用还是百兆级别，这个还是有优化的必要。</p>
-
-<p>本工具尝试将圣诗歌谱数字化存储后再还原成图片以供显示。歌谱采用简谱。</p>
-
-<p>本工具可以处理一般复杂度的圣诗的简谱。</p>
-
-<h2>
-<a id="语法" class="anchor" href="#%E8%AF%AD%E6%B3%95" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>语法</h2>
-
-<h3>
-<a id="前提" class="anchor" href="#%E5%89%8D%E6%8F%90" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>前提</h3>
-
-<ul>
-<li>圣诗由声明、歌谱、歌词三种内容构成。</li>
-<li>声明 按行存储，不需要解析的纯文本。</li>
-<li>歌谱 按行存储，需要解析的纯文本。</li>
-<li>歌词 按行存储，需要解析的纯文本。</li>
-<li>还原时，依次解析各行并绘制结果。</li>
-</ul>
-
-<h3>
-<a id="声明" class="anchor" href="#%E5%A3%B0%E6%98%8E" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>声明</h3>
-
-<p>以前导<code>~</code>开头的一行文本，前导之后的字符串原文输出。</p>
-
-<pre><code>~ 1=D 2/2 | XB005 | Author: George Webster
-</code></pre>
-
-<p>如果需要控制距离，可以用全角空格。半角空格等标准空白字符将被合并。</p>
-
-<h3>
-<a id="歌词" class="anchor" href="#%E6%AD%8C%E8%AF%8D" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>歌词</h3>
-
-<p>以前导<code>&gt;</code>开头的一行文本，前导之后的字符串，按照一个字符占一格的方式输出。因此，如果歌词字符之间有歌谱的小节线等，需要使用空格留空。</p>
-
-<pre><code>&gt; 需 要  耶稣   需 要  耶稣   人人 都需要耶 稣
-</code></pre>
-
-<h3>
-<a id="歌谱" class="anchor" href="#%E6%AD%8C%E8%B0%B1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>歌谱</h3>
-
-<p>歌谱行由音符和控制符号构成。</p>
-
-<h4>
-<a id="音符" class="anchor" href="#%E9%9F%B3%E7%AC%A6" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>音符</h4>
-
-<p>按照如下正则表达式解析。不符合此校验者将被原样输出。</p>
-
-<pre><code>^[\(]?[#bn]?([0]|([1-7](\&lt;|\&gt;)*))[~]?((\.)|(\.?_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$
-</code></pre>
-
-<h4>
-<a id="控制符号" class="anchor" href="#%E6%8E%A7%E5%88%B6%E7%AC%A6%E5%8F%B7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>控制符号</h4>
-
-<p>包括以下类型。</p>
-
-<pre><code>||: 
+            <a id="sinriscoredrawer" class="anchor" href="#sinriscoredrawer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            SinriScoreDrawer
+          </h1>
+          <p>A tool to parse and draw numbered musical notation with lyrics.</p>
+          <p>
+            <a href="https://codeclimate.com/github/sinri/SinriScoreDrawer"><img src="https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/gpa.svg" alt="Code Climate"></a>
+            <a href="https://codeclimate.com/github/sinri/SinriScoreDrawer"><img src="https://codeclimate.com/github/sinri/SinriScoreDrawer/badges/issue_count.svg" alt="Issue Count"></a>
+            GitHub Raw File CDN: <a href="https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js">https://raw.githubusercontent.com/sinri/SinriScoreDrawer/master/SinriScoreDrawer.js</a>
+          </p>
+          <h2>
+            <a id="缘起" class="anchor" href="#%E7%BC%98%E8%B5%B7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            缘起
+          </h2>
+          <p>“小群的诗歌本”需要存储圣诗歌谱，之前开发的<a href="https://github.com/sinri/Monochrome">Monochrome</a>图片有损压缩起了相当的作用。然而因为圣诗太多，整体应用的存储占用还是百兆级别，这个还是有优化的必要。</p>
+          <p>本工具尝试将圣诗歌谱数字化存储后再还原成图片以供显示。歌谱采用简谱。</p>
+          <p>本工具可以处理一般复杂度的圣诗的简谱。</p>
+          <h2>
+            <a id="语法" class="anchor" href="#%E8%AF%AD%E6%B3%95" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            语法
+          </h2>
+          <h3>
+            <a id="前提" class="anchor" href="#%E5%89%8D%E6%8F%90" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            前提
+          </h3>
+          <ul>
+            <li>圣诗由声明、歌谱、歌词三种内容构成。</li>
+            <li>声明 按行存储，不需要解析的纯文本。</li>
+            <li>歌谱 按行存储，需要解析的纯文本。</li>
+            <li>歌词 按行存储，需要解析的纯文本。</li>
+            <li>还原时，依次解析各行并绘制结果。</li>
+          </ul>
+          <h3>
+            <a id="声明" class="anchor" href="#%E5%A3%B0%E6%98%8E" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            声明
+          </h3>
+          <p>以前导<code>~</code>开头的一行文本，前导之后的字符串原文输出。</p>
+          <pre><code>~ 1=D 2/2 | XB005 | Author: George Webster</code></pre>
+          <p>如果需要控制距离，可以用全角空格。半角空格等标准空白字符将被合并。</p>
+          <h3>
+            <a id="歌词" class="anchor" href="#%E6%AD%8C%E8%AF%8D" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            歌词
+          </h3>
+          <p>以前导<code>&gt;</code>开头的一行文本，前导之后的字符串，按照一个字符占一格的方式输出。因此，如果歌词字符之间有歌谱的小节线等，需要使用空格留空。</p>
+          <pre><code>&gt; 需 要  耶稣   需 要  耶稣   人人 都需要耶 稣</code></pre>
+          <h3>
+            <a id="歌谱" class="anchor" href="#%E6%AD%8C%E8%B0%B1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            歌谱
+          </h3>
+          <p>歌谱行由音符和控制符号构成。</p>
+          <h4>
+            <a id="音符" class="anchor" href="#%E9%9F%B3%E7%AC%A6" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            音符
+          </h4>
+          <p>按照如下正则表达式解析。不符合此校验者将被原样输出。</p>
+          <pre><code>^[\(]?[#bn]?([0]|([1-7](\&lt;|\&gt;)*))[~]?((\.)|(\.?_+)|(\-+)|(\*[1-9][0-9]*)|(\/[1-9][0-9]*))?[\)]?(:[A-Z]+)?$</code></pre>
+          <h4>
+            <a id="控制符号" class="anchor" href="#%E6%8E%A7%E5%88%B6%E7%AC%A6%E5%8F%B7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            控制符号
+          </h4>
+          <p>包括以下类型。</p>
+          <pre><code>||:
 :||
 |:
 :|
 |
 ||
-</code></pre>
-
-<h4>
-<a id="音符构成" class="anchor" href="#%E9%9F%B3%E7%AC%A6%E6%9E%84%E6%88%90" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>音符构成</h4>
-
-<p>音符构成按如下顺序进行，标记从空白开始。</p>
-
-<ol>
-<li>我们使用通行的标准的4分音符作为原位音程，用<code>1</code>,<code>2</code>,<code>3</code>,<code>4</code>,<code>5</code>,<code>6</code>,<code>7</code>表示标准音高，而<code>0</code>表示休止符。现在我们得到的标记为<code>1</code>。</li>
-<li>当音高发生高八度的时候，在当前标记的右边加上<code>&gt;</code>；低八度的时候，在当前标记的右边加上<code>&lt;</code>。如<code>1&gt;</code>和<code>1&lt;</code>。</li>
-<li>当我们需要标记♯、♭、♮的时候，在当前标记的左边加上<code>#</code>、<code>b</code>、<code>n</code>。如<code>#1&gt;</code>。（倍升音符之类的罕见物品请不要强求。）</li>
-<li>当我们需要标记非四分之一音程的时候，分3类：延长线、下划线、附点和三连音。一个延长线在当前标记的右边加上<code>-</code>。一个下划线在当前标记的右边加上<code>_</code>。附点在当前标记右边加上<code>.</code>。三连音在当前标记右边加上<code>~</code>。</li>
-<li>如果本音符是连音线的起始，在当前标记左边加上<code>(</code>。如果本音符是连音线的结束，在当前标记右边加上<code>)</code>。</li>
-<li>如果有特殊标记，在当前标记右侧加上<code>:</code>以及标记代码。</li>
-</ol>
-
-<p>特殊标记代码如下</p>
-
-<pre><code>`F`: f,
+          </code></pre>
+          <h4>
+            <a id="音符构成" class="anchor" href="#%E9%9F%B3%E7%AC%A6%E6%9E%84%E6%88%90" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            音符构成
+          </h4>
+          <p>音符构成按如下顺序进行，标记从空白开始。</p>
+          <ol>
+            <li>我们使用通行的标准的4分音符作为原位音程，用<code>1</code>,<code>2</code>,<code>3</code>,<code>4</code>,<code>5</code>,<code>6</code>,<code>7</code>表示标准音高，而<code>0</code>表示休止符。现在我们得到的标记为<code>1</code>。</li>
+            <li>当音高发生高八度的时候，在当前标记的右边加上<code>&gt;</code>；低八度的时候，在当前标记的右边加上<code>&lt;</code>。如<code>1&gt;</code>和<code>1&lt;</code>。</li>
+            <li>当我们需要标记♯、♭、♮的时候，在当前标记的左边加上<code>#</code>、<code>b</code>、<code>n</code>。如<code>#1&gt;</code>。（倍升音符之类的罕见物品请不要强求。）</li>
+            <li>当我们需要标记非四分之一音程的时候，分3类：延长线、下划线、附点和三连音。一个延长线在当前标记的右边加上<code>-</code>。一个下划线在当前标记的右边加上<code>_</code>。附点在当前标记右边加上<code>.</code>。三连音在当前标记右边加上<code>~</code>。</li>
+            <li>如果本音符是连音线的起始，在当前标记左边加上<code>(</code>。如果本音符是连音线的结束，在当前标记右边加上<code>)</code>。</li>
+            <li>如果有特殊标记，在当前标记右侧加上<code>:</code>以及标记代码。</li>
+          </ol>
+          <p>特殊标记代码如下</p>
+          <pre><code>`F`: f,
 `FF`: ff,
 `P`: p,
 `PP`: pp,
@@ -136,26 +122,22 @@ GitHub Raw File CDN: <a href="https://raw.githubusercontent.com/sinri/SinriScore
 `RALL`: rall...,
 `ATEMPO`: a tempo,
 `VF`: &gt;
-</code></pre>
-
-<h2>
-<a id="样本" class="anchor" href="#%E6%A0%B7%E6%9C%AC" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>样本</h2>
-
-<pre><code>5- 5- | 3 5-- | 1&gt;- 1&gt;- | 6 1&gt;-- | 
+          </code></pre>
+          <h2>
+            <a id="样本" class="anchor" href="#%E6%A0%B7%E6%9C%AC" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            样本
+          </h2>
+          <pre><code>5- 5- | 3 5-- | 1&gt;- 1&gt;- | 6 1&gt;-- |
 5- 5- | 6 5 5 3 | (2--- | 2--) 0 |
 3 3 3 2 | 2 1 1- | 5 5 5 4 | 3 4 5- |
 6 1&gt; 1&gt;. 6_ | 5 1&gt; 1&gt; 1&gt; | 3- 2- | 2 1-- ||
-</code></pre>
-
-<p>自行下载本项目并利用example.htm配合JS文件在浏览器中观测效果。</p>
+          </code></pre>
+          <p>自行下载本项目并利用example.htm配合JS文件在浏览器中观测效果或移步 <a href="playground.html">Playground</a> 。</p>
         </section>
-
         <footer>
           SinriScoreDrawer is maintained by <a href="https://github.com/sinri">sinri</a><br>
           This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
         </footer>
-
-        
       </div>
     </div>
   </body>
